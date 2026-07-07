@@ -67,3 +67,23 @@ A：当前方案是单文件 exe。若需要 NSIS 安装向导，可在此基础
 | Windows | pywebview (WebView2/Edge) | 本构建产出 |
 | macOS | pywebview (WebKit) 或 原 Swift 壳 | 原 macOS 版走 Swift 壳 |
 | Linux | pywebview (GTK-WebKit) | 需系统装 webkit2gtk |
+
+## 排错（构建后没有 exe？）
+
+`build.bat` 现在**不会**闪退。任何错误都会写进 `build.log`，并在结尾暂停让你看清楚。
+
+1. 打开 `work\build.log`（与 `build.bat` 同级），从最后往前看 `[ERROR]` 行。
+2. 把最后的 `[ERROR]` 内容发我，我帮你定位。
+
+常见失败与对策：
+
+| 现象 | 原因 | 对策 |
+|------|------|------|
+| `python 不是内部或外部命令` | Python 没加入 PATH | 重装 Python 并勾选 "Add python.exe to PATH" |
+| `[ERROR] dependency install failed` | pip 装包失败（网络/镜像） | 看 build.log 里 pip 的具体报错；可改用国内镜像 `pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple` |
+| `[WARN] ffmpeg download failed` | GitHub 下载被墙/超时 | 手动下载 `ffmpeg-master-latest-win64-gpl.zip`（BtbN 构建版），解压把 `bin\ffmpeg.exe`、`bin\ffprobe.exe` 复制到 `red_sprite_app\bin\windows\`，再重跑 `build.bat`；或构建完成后把这两个 exe 直接复制到 `dist\` 与 `red-sprite-filter.exe` 放在一起 |
+| `[ERROR] PyInstaller build failed` | 多为模块收集失败 | 看 build.log 末尾 PyInstaller 报错并截图发我 |
+| 构建成功但运行时提示 `ffmpeg not found` | ffmpeg 没打进 exe | 把 `ffmpeg.exe`/`ffprobe.exe` 复制到 `dist\` 与 exe 同目录即可（运行时也会到 exe 所在目录找） |
+
+> 提示：Windows 上首次运行 `red-sprite-filter.exe` 可能被 SmartScreen 拦截，点击「更多信息 → 仍要运行」即可。
+

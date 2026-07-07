@@ -16,21 +16,35 @@ APP_PKG = ROOT / "red_sprite_app"
 STATIC = APP_PKG / "static"
 BIN_WIN = APP_PKG / "bin" / "windows"
 
+def _collect_datas():
+    """Data files to bundle. ffmpeg/ffprobe are bundled only if present, so a
+    missing download does not abort the whole build (the .bat copies them next
+    to the exe as a fallback, and the runtime also searches the exe directory)."""
+    datas = [
+        (str(STATIC), "red_sprite_app/static"),
+        (str(ROOT / "red_sprite_filter.py"), "."),
+    ]
+    for exe in (BIN_WIN / "ffmpeg.exe", BIN_WIN / "ffprobe.exe"):
+        if exe.exists():
+            datas.append((str(exe), "."))
+        else:
+            print(f"WARNING: {exe} not found - ffmpeg will NOT be bundled.")
+            print("         Run windows/get_ffmpeg.py first, or copy ffmpeg.exe/ffprobe.exe")
+            print("         next to the built red-sprite-filter.exe before shipping.")
+    return datas
+
+
 a = Analysis(
     [str(ROOT / "run_desktop.py")],
     pathex=[str(ROOT)],
     binaries=[],
-    datas=[
-        (str(STATIC), "red_sprite_app/static"),
-        (str(ROOT / "red_sprite_filter.py"), "."),
-        (str(BIN_WIN / "ffmpeg.exe"), "."),
-        (str(BIN_WIN / "ffprobe.exe"), "."),
-    ],
+    datas=_collect_datas(),
     hiddenimports=[
         "red_sprite_app",
         "red_sprite_app.backend",
         "red_sprite_app.models",
         "red_sprite_app.desktop",
+        "red_sprite_filter",
         "webview",
         "tkinter",
         "tkinter.filedialog",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import mimetypes
 import os
@@ -213,11 +214,65 @@ def _read_json(handler: BaseHTTPRequestHandler) -> dict[str, object]:
     return json.loads(handler.rfile.read(length).decode("utf-8"))
 
 
+class _ScanLogWriter(io.TextIOBase):
+    """Tee stdout into both the on-disk run log and the in-memory state log."""
+
+    def __init__(self, log_file: "io.TextIOBase") -> None:
+        self._log = log_file
+
+    def write(self, s: str) -> int:
+        if s:
+            for line in s.splitlines():
+                line = line.rstrip("\n")
+                self._log.write(line + "\n")
+                self._log.flush()
+                STATE.append_log(line)
+        return len(s)
+
+
+def _run_detector_in_process(argv: list[str], log_file: "io.TextIOBase") -> int:
+    """Run the detector module in-process.
+
+    Used when frozen by PyInstaller, because ``sys.executable`` is then the
+    bundled application (not a Python interpreter), so we cannot spawn it with
+    ``red_sprite_filter.py`` as an argument the way we do in source mode.
+    """
+    import red_sprite_filter as detector
+
+    saved_stdout = sys.stdout
+    sys.stdout = _ScanLogWriter(log_file)
+    try:
+        return int(detector.main(argv) or 0)
+    except Exception as exc:  # pragma: no cover - defensive
+        STATE.append_log(f"ERROR: {exc}")
+        return 1
+    finally:
+        sys.stdout = saved_stdout
+
+
 def _run_scan(command: list[str], output: Path, settings: dict[str, object]) -> None:
     output.mkdir(parents=True, exist_ok=True)
     (output / "settings.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     log_path = output / "run_log.txt"
     STATE.append_log("开始扫描")
+    frozen = getattr(sys, "_MEIPASS", None) is not None
+    with STATE.lock:
+        STATE.running = True
+        STATE.last_output = output
+        STATE.last_returncode = None
+
+    if frozen:
+        # sys.executable is the bundled app, so run the detector module in-process.
+        # command == [sys.executable, DETECTOR, ...]; drop the first two entries.
+        argv = command[2:]
+        with log_path.open("w", encoding="utf-8") as log:
+            returncode = _run_detector_in_process(argv, log)
+        with STATE.lock:
+            STATE.running = False
+            STATE.last_returncode = returncode
+        STATE.append_log(f"扫描结束，退出码 {returncode}")
+        return
+
     with log_path.open("w", encoding="utf-8") as log:
         process = subprocess.Popen(
             command,
