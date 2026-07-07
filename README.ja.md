@@ -54,6 +54,19 @@ DMG を開き、アプリ（`红色精灵筛选器.app`、表示名は "Red Spri
 2. 「開く」を選択
 3. ダイアログでもう一度「開く」をクリック
 
+## Windows 版
+
+本ツールは **Windows** でも動作します。クロスプラットフォームのデスクトップ枠組みとして **Python + pywebview**（Windows 上は WebView2 / Edge）を使用し、コアの検出ロジックは macOS 版と同一です。ffmpeg/ffprobe は実行ファイルに同梱されるため、そのまま使えます。
+
+Windows 版は **ソース + ビルドスクリプト** の形で提供します（macOS から Windows 用 .exe をクロスコンパイルできないため）。Windows PC での手順：
+
+1. **Python 3.10+** をインストール（「Add python.exe to PATH」にチェック）
+2. リポジトリをクローン：`git clone https://github.com/shutiaostars/red-sprite-filter.git`
+3. `src/windows` を開き、`build.bat` をダブルクリック
+4. 生成物は `src/dist/red-sprite-filter.exe`（単一ファイル、ダブルクリックで実行、インストール不要）
+
+詳細は [`src/windows/README_build.md`](src/windows/README_build.md) を参照。エンドユーザーは `red-sprite-filter.exe` だけで十分です。初回起動で SmartScreen にブロックされた場合は「詳細情報 → 実行」をクリックしてください。
+
 ## 動作に必要な環境
 
 パッケージを小さく保つため、現在のバージョンは対象の Mac にあらかじめあるローカル実行環境を再利用します。必要なもの：

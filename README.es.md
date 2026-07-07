@@ -54,6 +54,19 @@ Para abrirla:
 2. Elige "Abrir"
 3. Vuelve a hacer clic en "Abrir" en el diálogo
 
+## Versión para Windows
+
+La herramienta también funciona en **Windows**. Usa un contenedor de escritorio multiplataforma **Python + pywebview** (WebView2 / Edge en Windows), mientras que la lógica de detección central es idéntica a la versión de macOS. ffmpeg/ffprobe se incluyen en el programa, así que funciona tal cual.
+
+La compilación de Windows se proporciona como **código fuente + scripts de compilación** (no se puede compilar cruzado un .exe de Windows desde macOS). En tu PC con Windows:
+
+1. Instala **Python 3.10+** (marca "Add python.exe to PATH")
+2. Clona el repositorio: `git clone https://github.com/shutiaostars/red-sprite-filter.git`
+3. Abre `src/windows` y haz doble clic en `build.bat`
+4. El resultado es `src/dist/red-sprite-filter.exe` (un solo archivo, doble clic para ejecutar, sin instalar)
+
+Los pasos completos están en [`src/windows/README_build.md`](src/windows/README_build.md). Los usuarios finales solo necesitan `red-sprite-filter.exe`; si SmartScreen bloquea el primer arranque, haz clic en "Más información → Ejecutar de todos modos".
+
 ## Dependencias
 
 Para mantener el paquete pequeño, la versión actual reutiliza el entorno local que ya esté presente en el Mac de destino. Necesitas:

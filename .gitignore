@@ -8,3 +8,10 @@ Thumbs.db
 
 # Internal authoring/publish guide (not intended for the public repo)
 UPLOAD_TO_GITHUB.md
+
+# Windows build artifacts (generated locally; not committed)
+src/red_sprite_app/bin/
+src/dist/
+src/build/
+src/venv/
+src/windows/.cache/

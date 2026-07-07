@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>红色精灵筛选器</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="control-panel">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <div>
+            <h1>红色精灵筛选器</h1>
+            <p>Red Sprite Screening Console</p>
+          </div>
+        </div>
+        <label class="field">
+          <span>视频或文件夹路径</span>
+          <input id="sourcePath" type="text" />
+        </label>
+        <div class="path-actions">
+          <button id="chooseVideo" type="button">选择视频</button>
+          <button id="chooseSourceFolder" type="button">选择文件夹</button>
+        </div>
+        <label class="field">
+          <span>输出目录</span>
+          <input id="outputPath" type="text" />
+        </label>
+        <div class="path-actions single">
+          <button id="chooseOutputFolder" type="button">选择输出目录</button>
+        </div>
+        <div class="segmented" role="group" aria-label="筛选模式">
+          <button id="precisionMode" class="active" type="button">精准筛选</button>
+          <button id="recallMode" type="button">高召回筛选</button>
+        </div>
+        <div class="settings-grid">
+          <label>候选上限 <input id="maxCandidates" type="number" min="1" value="24" /></label>
+          <label>最小分数 <input id="minScore" type="number" step="0.01" value="0.8" /></label>
+          <label>最小红像素 <input id="minRedPixels" type="number" min="1" value="8" /></label>
+          <label>前置秒数 <input id="preSeconds" type="number" step="0.1" value="1.0" /></label>
+          <label>后置秒数 <input id="postSeconds" type="number" step="0.1" value="2.0" /></label>
+        </div>
+        <div class="actions">
+          <button id="startScan" class="primary" type="button">开始筛选</button>
+          <button id="cancelScan" type="button">取消</button>
+        </div>
+        <div id="dependencyList" class="dependency-list"></div>
+      </section>
+      <section class="workspace">
+        <div class="status-strip">
+          <div><span class="metric-label">状态</span><strong id="runState">待机</strong></div>
+          <div><span class="metric-label">候选</span><strong id="candidateCount">0</strong></div>
+          <div><span class="metric-label">输出</span><strong id="outputSummary">未生成</strong></div>
+        </div>
+        <div class="result-layout">
+          <div id="candidateGrid" class="candidate-grid"></div>
+          <aside class="detail-pane">
+            <img id="detailImage" alt="" />
+            <video id="detailVideo" controls preload="metadata"></video>
+            <div id="detailMeta" class="detail-meta"></div>
+            <div class="review-actions">
+              <button data-state="confirmed" type="button">确认</button>
+              <button data-state="suspected" type="button">疑似</button>
+              <button data-state="false_positive" type="button">排除</button>
+            </div>
+            <div class="actions compact">
+              <button id="saveReview" type="button">保存复核</button>
+              <button id="openReport" type="button">打开报告</button>
+              <button id="openOutput" type="button">打开目录</button>
+            </div>
+          </aside>
+        </div>
+        <pre id="logView" class="log-view"></pre>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
