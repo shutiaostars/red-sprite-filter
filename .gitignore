@@ -1,0 +1,10 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+Thumbs.db
+
+# Release artifact — distributed via GitHub Releases, not committed to the repo
+红色精灵筛选器.dmg
+
+# Internal authoring/publish guide (not intended for the public repo)
+UPLOAD_TO_GITHUB.md
