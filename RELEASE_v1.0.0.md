@@ -7,7 +7,7 @@
 请下载本 Release 附件：
 
 ```text
-红色精灵筛选器.dmg
+red-sprite-filter-1.0.0.dmg
 ```
 
 SHA-256:
@@ -29,7 +29,7 @@ bd6af44aeb2a082ca09b5dfd14843dacc68388054564da5f9bdece595a2d1833
 
 ## 安装方法
 
-1. 下载 `红色精灵筛选器.dmg`
+1. 下载 `red-sprite-filter-1.0.0.dmg`
 2. 打开 DMG
 3. 将 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹
 4. 右键 App，选择“打开”

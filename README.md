@@ -37,7 +37,7 @@
 到右侧或页面下方的 **Releases** 中下载：
 
 ```text
-红色精灵筛选器.dmg
+red-sprite-filter-1.0.0.dmg
 ```
 
 下载后打开 DMG，把 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹即可。
