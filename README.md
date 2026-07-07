@@ -54,19 +54,6 @@ red-sprite-filter-1.0.0.dmg
 2. 选择“打开”
 3. 在弹窗中再次点击“打开”
 
-## Windows 版本
-
-本工具已支持 Windows。代码采用 **Python + pywebview** 作为跨平台桌面壳（Windows 上走系统自带的 Edge / WebView2），核心检测逻辑与 macOS 版完全一致，ffmpeg/ffprobe 会一并打包进程序，开箱即用。
-
-目前 Windows 版以**源码 + 构建脚本**形式提供（在 Mac 上无法交叉编译 Windows 程序）。在你的 Windows 电脑上按以下步骤生成单文件 `.exe`：
-
-1. 安装 **Python 3.10+**（勾选 “Add python.exe to PATH”）
-2. 克隆仓库：`git clone https://github.com/shutiaostars/red-sprite-filter.git`
-3. 进入 `src/windows` 目录，双击 `build.bat`
-4. 构建完成后生成 `src/dist/red-sprite-filter.exe`（单文件、双击即用、无需安装）
-
-详细说明见 [`src/windows/README_build.md`](src/windows/README_build.md)。最终用户只需拿到 `red-sprite-filter.exe`，首次运行若被 SmartScreen 拦截，点击「更多信息 → 仍要运行」即可。
-
 ## 依赖
 
 当前版本为了保持包体较小，仍使用目标电脑上的本地运行环境。需要：
