@@ -1,8 +1,8 @@
-[English](README.en.md) | [中文](README.md)
+**[中文](README.md)** | [English](README.en.md) | [日本語](README.ja.md) | [Español](README.es.md) | [Deutsch](README.de.md)
 
 # 红色精灵筛选器
 
-一个面向雷暴摄影、星空摄影和高空瞬态发光事件观测的 macOS 桌面工具，用来从微单相机拍摄的雷暴视频中自动筛选疑似红色精灵闪电帧与片段。
+一个面向高空瞬态发光事件观测的 macOS 桌面工具，用来从相机拍摄的雷暴视频中自动筛选疑似红色精灵闪电帧与片段。
 
 ![macOS](https://img.shields.io/badge/macOS-12%2B-0b1220?style=flat-square)
 ![Release](https://img.shields.io/badge/download-DMG-00bcd4?style=flat-square)

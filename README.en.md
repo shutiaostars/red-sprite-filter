@@ -1,8 +1,8 @@
-[English](README.en.md) | [中文](README.md)
+[中文](README.md) | **[English](README.en.md)** | [日本語](README.ja.md) | [Español](README.es.md) | [Deutsch](README.de.md)
 
 # Red Sprite Filter
 
-A macOS desktop tool for thunderstorm photography, astrophotography, and transient luminous event (TLE) observation. It automatically screens suspected **red sprite** lightning frames and clips from videos recorded by mirrorless cameras.
+A macOS desktop tool for transient luminous event (TLE) observation that automatically screens suspected **red sprite** lightning frames and clips from storm videos recorded by cameras.
 
 ![macOS](https://img.shields.io/badge/macOS-12%2B-0b1220?style=flat-square)
 ![Release](https://img.shields.io/badge/download-DMG-00bcd4?style=flat-square)
