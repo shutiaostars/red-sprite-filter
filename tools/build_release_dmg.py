@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import sys
 import hashlib
+import re
 from pathlib import Path
 
 import build_app
@@ -107,6 +108,17 @@ python3 -m pip install numpy Pillow
     )
 
 
+def refresh_github_publish_files(digest: str) -> None:
+    if not GITHUB_PUBLISH.exists():
+        return
+
+    shutil.copy2(RELEASE_DMG, GITHUB_PUBLISH / RELEASE_DMG.name)
+    (GITHUB_PUBLISH / "CHECKSUMS.txt").write_text(f"{digest}  {RELEASE_DMG.name}\n", encoding="utf-8")
+    for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.0*.md"):
+        text = path.read_text(encoding="utf-8")
+        path.write_text(re.sub(r"[0-9a-f]{64}", digest, text), encoding="utf-8")
+
+
 def build_dmg() -> Path:
     app = build_app.build()
     if DMG.exists():
@@ -131,9 +143,7 @@ def build_dmg() -> Path:
     shutil.copy2(DMG, RELEASE_DMG)
     digest = sha256(RELEASE_DMG)
     write_release_notes(digest)
-    if GITHUB_PUBLISH.exists():
-        shutil.copy2(RELEASE_DMG, GITHUB_PUBLISH / RELEASE_DMG.name)
-        (GITHUB_PUBLISH / "CHECKSUMS.txt").write_text(f"{digest}  {RELEASE_DMG.name}\n", encoding="utf-8")
+    refresh_github_publish_files(digest)
     return DMG
 
 

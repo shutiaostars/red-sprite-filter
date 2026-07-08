@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-WORK = ROOT / "work"
+SOURCE_ROOT = ROOT / "work" if (ROOT / "work").exists() else ROOT / "src"
 OUTPUTS = ROOT / "outputs"
 APP = OUTPUTS / "红色精灵筛选器.app"
 CONTENTS = APP / "Contents"
@@ -17,14 +17,14 @@ MACOS = CONTENTS / "MacOS"
 RESOURCES = CONTENTS / "Resources"
 APP_RESOURCES = RESOURCES / "app"
 EXECUTABLE = "red-sprite-filter"
-ICON_SOURCE = WORK / "red_sprite_app" / "assets" / "AppIcon-source.png"
+ICON_SOURCE = SOURCE_ROOT / "red_sprite_app" / "assets" / "AppIcon-source.png"
 ICON_OUTPUT = RESOURCES / "AppIcon.icns"
 
 
 def copytree(src: Path, dst: Path) -> None:
     if dst.exists():
         shutil.rmtree(dst)
-    shutil.copytree(src, dst)
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
 
 
 def write_plist() -> None:
@@ -69,6 +69,15 @@ def write_icon() -> None:
         subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(ICON_OUTPUT)], check=True)
 
 
+def strip_extended_attributes(path: Path) -> None:
+    subprocess.run(["xattr", "-cr", str(path)], check=True)
+
+
+def sign_app() -> None:
+    subprocess.run(["codesign", "--force", "--deep", "--sign", "-", str(APP)], check=True)
+    subprocess.run(["codesign", "--verify", "--deep", "--strict", "--verbose=2", str(APP)], check=True)
+
+
 def build() -> Path:
     if APP.exists():
         shutil.rmtree(APP)
@@ -77,13 +86,13 @@ def build() -> Path:
     write_plist()
     write_icon()
 
-    copytree(WORK / "red_sprite_app", APP_RESOURCES / "red_sprite_app")
-    shutil.copy2(WORK / "red_sprite_filter.py", APP_RESOURCES / "red_sprite_filter.py")
+    copytree(SOURCE_ROOT / "red_sprite_app", APP_RESOURCES / "red_sprite_app")
+    shutil.copy2(SOURCE_ROOT / "red_sprite_filter.py", APP_RESOURCES / "red_sprite_filter.py")
     executable = MACOS / EXECUTABLE
     subprocess.run(
         [
             "swiftc",
-            str(WORK / "red_sprite_app" / "native" / "RedSpriteFilterApp.swift"),
+            str(SOURCE_ROOT / "red_sprite_app" / "native" / "RedSpriteFilterApp.swift"),
             "-framework",
             "Cocoa",
             "-framework",
@@ -106,6 +115,8 @@ def build() -> Path:
     missing = [path for path in required if not path.exists()]
     if missing:
         raise RuntimeError("Missing app bundle files: " + ", ".join(str(path) for path in missing))
+    strip_extended_attributes(APP)
+    sign_app()
     return APP
 
 

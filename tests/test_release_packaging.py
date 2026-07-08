@@ -1,12 +1,15 @@
 import plistlib
+import hashlib
 import subprocess
 import sys
 import unittest
 from pathlib import Path
 
 
-ROOT = Path("/Users/heyi/Documents/Codex/2026-07-08/new-chat")
+ROOT = Path(__file__).resolve().parents[1]
 DMG = ROOT / "outputs" / "红色精灵筛选器.dmg"
+RELEASE_DMG = ROOT / "outputs" / "red-sprite-filter-1.0.0.dmg"
+GITHUB_PUBLISH = ROOT / "outputs" / "github_publish"
 NOTES = ROOT / "outputs" / "GITHUB_RELEASE_NOTES.md"
 
 
@@ -33,6 +36,13 @@ class ReleasePackagingTests(unittest.TestCase):
             plist = plistlib.load(handle)
 
         self.assertEqual(plist["CFBundleExecutable"], "red-sprite-filter")
+
+    def test_github_publish_hashes_match_current_release_dmg(self):
+        digest = hashlib.sha256(RELEASE_DMG.read_bytes()).hexdigest()
+
+        self.assertEqual((GITHUB_PUBLISH / "CHECKSUMS.txt").read_text(encoding="utf-8"), f"{digest}  {RELEASE_DMG.name}\n")
+        for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.0*.md"):
+            self.assertIn(digest, path.read_text(encoding="utf-8"), str(path))
 
 
 if __name__ == "__main__":

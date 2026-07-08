@@ -5,6 +5,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = ROOT / "work" if (ROOT / "work").exists() else ROOT / "src"
+sys.path.insert(0, str(SOURCE_ROOT))
+
 from red_sprite_app.backend import (
     build_choose_path_script,
     build_runtime_path,

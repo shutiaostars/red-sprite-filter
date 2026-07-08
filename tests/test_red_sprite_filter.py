@@ -1,8 +1,13 @@
 import tempfile
+import sys
 import unittest
 from pathlib import Path
 
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = ROOT / "work" if (ROOT / "work").exists() else ROOT / "src"
+sys.path.insert(0, str(SOURCE_ROOT))
 
 import red_sprite_filter as rsf
 

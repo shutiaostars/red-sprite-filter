@@ -13,7 +13,7 @@ red-sprite-filter-1.0.0.dmg
 SHA-256:
 
 ```text
-54a3873b3253c5f10ded084babd1cd58ce5d9722b1cc02be868b097fa2475268
+9aa9a3f5656fec5c9b1fd8d03a34e9184d2861b7e579a703796b7db704196c87
 ```
 
 ## Main features
@@ -86,7 +86,7 @@ red-sprite-filter-1.0.0.dmg
 SHA-256:
 
 ```text
-54a3873b3253c5f10ded084babd1cd58ce5d9722b1cc02be868b097fa2475268
+9aa9a3f5656fec5c9b1fd8d03a34e9184d2861b7e579a703796b7db704196c87
 ```
 
 ## 主要功能
@@ -163,7 +163,7 @@ red-sprite-filter-1.0.0.dmg
 SHA-256:
 
 ```text
-54a3873b3253c5f10ded084babd1cd58ce5d9722b1cc02be868b097fa2475268
+9aa9a3f5656fec5c9b1fd8d03a34e9184d2861b7e579a703796b7db704196c87
 ```
 
 ## 主な機能
@@ -236,7 +236,7 @@ red-sprite-filter-1.0.0.dmg
 SHA-256:
 
 ```text
-54a3873b3253c5f10ded084babd1cd58ce5d9722b1cc02be868b097fa2475268
+9aa9a3f5656fec5c9b1fd8d03a34e9184d2861b7e579a703796b7db704196c87
 ```
 
 ## Funciones principales
@@ -309,7 +309,7 @@ red-sprite-filter-1.0.0.dmg
 SHA-256:
 
 ```text
-54a3873b3253c5f10ded084babd1cd58ce5d9722b1cc02be868b097fa2475268
+9aa9a3f5656fec5c9b1fd8d03a34e9184d2861b7e579a703796b7db704196c87
 ```
 
 ## Hauptfunktionen
