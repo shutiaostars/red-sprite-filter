@@ -13,7 +13,7 @@ red-sprite-filter-1.0.0.dmg
 SHA-256:
 
 ```text
-bd6af44aeb2a082ca09b5dfd14843dacc68388054564da5f9bdece595a2d1833
+54a3873b3253c5f10ded084babd1cd58ce5d9722b1cc02be868b097fa2475268
 ```
 
 ## 主要功能
