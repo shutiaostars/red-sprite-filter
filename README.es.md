@@ -31,6 +31,9 @@ La interfaz incluye:
 - Cribado preciso / cribado de alta recuperación
 - Cuadrícula de fotogramas candidatos
 - Reproducción de clips candidatos
+- Progreso del escaneo, tiempo transcurrido y tiempo restante estimado
+- Tiempo del clip en la línea temporal del vídeo original, por ejemplo `3:12-3:14`
+- Guía de puntuación con categorías de alta / media / baja sospecha
 - Revisión manual: confirmar / sospechoso / descartar
 - Abrir informe / abrir directorio de resultados
 
@@ -39,7 +42,7 @@ La interfaz incluye:
 Descarga desde la sección **Releases** (a la derecha o al final de la página):
 
 ```text
-red-sprite-filter-1.0.1.dmg
+red-sprite-filter-1.0.3.dmg
 ```
 
 Abre el DMG y arrastra la app (`红色精灵筛选器.app`, que se muestra como "Red Sprite Filter") a Aplicaciones o a cualquier carpeta.
@@ -98,6 +101,16 @@ Parámetros recomendados:
 - Píxeles rojos mínimos: 8
 
 Tras el cribado previo, vuelve a ejecutar en modo Preciso los vídeos sospechosos.
+
+## Guía de puntuación y categorías
+
+Los candidatos se etiquetan por prioridad de revisión:
+
+- `≥ 5.0`: objetivo altamente sospechoso
+- `1.0 - 5.0`: objetivo medianamente sospechoso
+- `< 1.0`: objetivo de baja sospecha
+
+La categoría solo indica prioridad de revisión, no una conclusión final. Conviene confirmar con el fotograma clave, el clip exportado y el vídeo original.
 
 ## Cómo distinguir si un candidato es un duende rojo
 

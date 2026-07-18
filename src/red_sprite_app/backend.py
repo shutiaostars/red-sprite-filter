@@ -29,6 +29,7 @@ DETECTOR = WORK_ROOT / "red_sprite_filter.py"
 STATIC_ROOT = APP_ROOT / "static"
 SUPPORTED_STATES = {"confirmed", "suspected", "false_positive", "unreviewed"}
 CHOOSE_PATH_KINDS = {"video", "source-folder", "output-folder"}
+PROGRESS_PREFIX = "PROGRESS_JSON "
 
 
 def _default_tool_dirs() -> list[str]:
@@ -71,11 +72,52 @@ class AppState:
         self.last_output: Path | None = None
         self.last_returncode: int | None = None
         self.running = False
+        self.progress_percent = 0.0
+        self.elapsed_seconds = 0.0
+        self.eta_seconds: float | None = None
+        self.current_video = ""
+        self.video_index = 0
+        self.total_videos = 0
+        self.processed_frames = 0
+        self.total_frames = 0
 
     def append_log(self, line: str) -> None:
+        stripped = line.rstrip()
+        if self._apply_progress_line(stripped):
+            return
         with self.lock:
-            self.logs.append(line.rstrip())
+            self.logs.append(stripped)
             self.logs = self.logs[-500:]
+
+    def reset_progress(self) -> None:
+        with self.lock:
+            self.progress_percent = 0.0
+            self.elapsed_seconds = 0.0
+            self.eta_seconds = None
+            self.current_video = ""
+            self.video_index = 0
+            self.total_videos = 0
+            self.processed_frames = 0
+            self.total_frames = 0
+
+    def _apply_progress_line(self, line: str) -> bool:
+        if not line.startswith(PROGRESS_PREFIX):
+            return False
+        try:
+            payload = json.loads(line.removeprefix(PROGRESS_PREFIX))
+        except json.JSONDecodeError:
+            return False
+        with self.lock:
+            self.progress_percent = float(payload.get("progress_percent", self.progress_percent))
+            self.elapsed_seconds = float(payload.get("elapsed_seconds", self.elapsed_seconds))
+            eta = payload.get("eta_seconds", self.eta_seconds)
+            self.eta_seconds = None if eta is None else float(eta)
+            self.current_video = str(payload.get("current_video", self.current_video))
+            self.video_index = int(payload.get("video_index", self.video_index))
+            self.total_videos = int(payload.get("total_videos", self.total_videos))
+            self.processed_frames = int(payload.get("processed_frames", self.processed_frames))
+            self.total_frames = int(payload.get("total_frames", self.total_frames))
+        return True
 
     def snapshot(self) -> dict[str, object]:
         with self.lock:
@@ -84,6 +126,14 @@ class AppState:
                 "logs": list(self.logs),
                 "last_output": str(self.last_output) if self.last_output else "",
                 "last_returncode": self.last_returncode,
+                "progress_percent": self.progress_percent,
+                "elapsed_seconds": self.elapsed_seconds,
+                "eta_seconds": self.eta_seconds,
+                "current_video": self.current_video,
+                "video_index": self.video_index,
+                "total_videos": self.total_videos,
+                "processed_frames": self.processed_frames,
+                "total_frames": self.total_frames,
             }
 
 
@@ -133,6 +183,7 @@ def build_scan_command(
         str(pre_seconds),
         "--post-seconds",
         str(post_seconds),
+        "--progress-json",
     ]
 
 
@@ -254,6 +305,7 @@ def _run_scan(command: list[str], output: Path, settings: dict[str, object]) -> 
     output.mkdir(parents=True, exist_ok=True)
     (output / "settings.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     log_path = output / "run_log.txt"
+    STATE.reset_progress()
     STATE.append_log("开始扫描")
     frozen = getattr(sys, "_MEIPASS", None) is not None
     with STATE.lock:

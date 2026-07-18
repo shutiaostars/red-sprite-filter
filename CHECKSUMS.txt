@@ -1,1 +1,1 @@
-6592d366d05a6cc46f9aa68486f4b553b360e722a1063c28e0a73f61f6381b7f  red-sprite-filter-1.0.1.dmg
+76dcce31d7ccb0643460c5ea353a1a4b17e6d8c46d6d01da64e4b7c47abc715a  red-sprite-filter-1.0.3.dmg

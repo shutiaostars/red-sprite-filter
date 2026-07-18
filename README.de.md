@@ -31,6 +31,9 @@ Die Oberfläche umfasst:
 - Präzises Filtern / Filter mit hohem Recall
 - Raster der Kandidatenframes
 - Wiedergabe von Kandidatenclips
+- Scan-Fortschritt, verstrichene Zeit und geschätzte Restzeit
+- Clip-Zeit auf der Originalvideo-Zeitachse, zum Beispiel `3:12-3:14`
+- Score-Leitfaden mit hoch / mittel / niedrig verdächtigen Kandidaten
 - Manuelle Überprüfung: Bestätigen / Verdächtig / Ausschließen
 - Bericht öffnen / Ergebnisordner öffnen
 
@@ -39,7 +42,7 @@ Die Oberfläche umfasst:
 Lade aus dem Bereich **Releases** (rechts oder unten auf der Seite) herunter:
 
 ```text
-red-sprite-filter-1.0.1.dmg
+red-sprite-filter-1.0.3.dmg
 ```
 
 Öffne die DMG und ziehe die App (`红色精灵筛选器.app`, angezeigt als "Red Sprite Filter") in die Programme oder einen beliebigen Ordner.
@@ -98,6 +101,16 @@ Empfohlene Parameter:
 - Min. rote Pixel: 8
 
 Nach der Vorfilterung einzeln die verdächtigen Videos im Modus „Präzise“ erneut ausführen.
+
+## Score-Leitfaden und Kategorien
+
+Kandidaten werden nach Überprüfungspriorität gekennzeichnet:
+
+- `≥ 5.0`: hoch verdächtiger Kandidat
+- `1.0 - 5.0`: mittel verdächtiger Kandidat
+- `< 1.0`: niedrig verdächtiger Kandidat
+
+Die Kategorie ist nur ein Hinweis für die Überprüfungspriorität und kein endgültiges Ergebnis. Bitte mit Keyframe, exportiertem Clip und Originalvideo bestätigen.
 
 ## So erkennst du, ob ein Kandidat ein Red Sprite ist
 

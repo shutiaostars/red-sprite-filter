@@ -175,6 +175,51 @@ button.primary {
   gap: 12px;
 }
 
+.score-guide {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid rgba(0, 229, 255, 0.24);
+  border-radius: 8px;
+  background: #020910;
+}
+
+.score-guide h2 {
+  margin: 0;
+  color: var(--instrument);
+  font-size: 14px;
+}
+
+.score-guide p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.score-guide dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.score-guide dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.score-guide dt,
+.score-guide dd {
+  margin: 0;
+}
+
+.score-guide dt {
+  color: var(--text);
+}
+
 .actions {
   display: flex;
   gap: 10px;
@@ -212,7 +257,7 @@ button.primary {
 
 .workspace {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) 180px;
+  grid-template-rows: auto auto minmax(0, 1fr) 180px;
   gap: 14px;
   padding: 14px;
   min-width: 0;
@@ -243,6 +288,70 @@ button.primary {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.progress-panel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background:
+    linear-gradient(180deg, rgba(0, 229, 255, 0.08), rgba(255, 63, 110, 0.04)),
+    #030b12;
+  box-shadow: inset 0 1px 0 rgba(120, 247, 255, 0.07);
+}
+
+.progress-header,
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.progress-header span {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-header strong {
+  color: var(--instrument);
+  font-size: 22px;
+  min-width: 58px;
+  text-align: right;
+}
+
+.progress-track {
+  height: 12px;
+  border: 1px solid rgba(0, 229, 255, 0.36);
+  border-radius: 999px;
+  overflow: hidden;
+  background: #01070c;
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.55);
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--sprite));
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.28);
+  transition: width 240ms ease;
+}
+
+.progress-meta {
+  color: var(--muted);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.progress-meta strong,
+#frameProgress {
+  color: var(--text);
 }
 
 .result-layout {
@@ -287,6 +396,36 @@ button.primary {
   padding: 9px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 22px;
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.score-badge.high {
+  border-color: rgba(255, 63, 110, 0.78);
+  background: rgba(255, 63, 110, 0.16);
+  color: #ffd3de;
+}
+
+.score-badge.medium {
+  border-color: rgba(0, 229, 255, 0.56);
+  background: rgba(0, 229, 255, 0.12);
+  color: #c9f8ff;
+}
+
+.score-badge.low {
+  border-color: rgba(255, 211, 106, 0.58);
+  background: rgba(255, 211, 106, 0.1);
+  color: #ffe7a4;
 }
 
 .detail-pane {
@@ -337,6 +476,6 @@ button.primary {
   }
 
   .workspace {
-    grid-template-rows: auto auto 180px;
+    grid-template-rows: auto auto minmax(0, 1fr) 180px;
   }
 }

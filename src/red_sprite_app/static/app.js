@@ -24,10 +24,58 @@ function setMode(mode) {
   $("minScore").value = mode === "precision" ? "0.8" : "0.012";
 }
 
+function formatDuration(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "--:--";
+  const total = Math.floor(seconds);
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const remainingSeconds = total % 60;
+  const mm = String(minutes).padStart(2, "0");
+  const ss = String(remainingSeconds).padStart(2, "0");
+  if (hours > 0) return `${hours}:${mm}:${ss}`;
+  return `${mm}:${ss}`;
+}
+
+function formatVideoTime(seconds) {
+  return formatDuration(Number(seconds));
+}
+
+function formatClipWindow(startSeconds, endSeconds) {
+  return `${formatVideoTime(startSeconds)}-${formatVideoTime(endSeconds)}`;
+}
+
+function suspicionCategory(score) {
+  const value = Number(score);
+  if (!Number.isFinite(value)) return { label: "待复核目标", className: "low" };
+  if (value >= 5.0) return { label: "高度疑似目标", className: "high" };
+  if (value >= 1.0) return { label: "中等疑似目标", className: "medium" };
+  return { label: "低疑似目标", className: "low" };
+}
+
+function renderProgress(payload) {
+  const rawPercent = Number(payload.progress_percent || 0);
+  const percent = Math.max(0, Math.min(100, Number.isFinite(rawPercent) ? rawPercent : 0));
+  const rounded = Math.round(percent);
+  $("progressBar").style.width = `${percent}%`;
+  $("progressPercent").textContent = `${rounded}%`;
+  const track = document.querySelector(".progress-track");
+  if (track) track.setAttribute("aria-valuenow", String(rounded));
+
+  const videoName = payload.current_video || (payload.running ? "准备扫描" : "未开始");
+  const index = Number(payload.video_index || 0);
+  const total = Number(payload.total_videos || 0);
+  $("currentVideo").textContent = index > 0 && total > 0 ? `${videoName}  ${index}/${total}` : videoName;
+  $("elapsedTime").textContent = formatDuration(Number(payload.elapsed_seconds || 0));
+  const eta = payload.eta_seconds === null || payload.eta_seconds === undefined ? NaN : Number(payload.eta_seconds);
+  $("etaTime").textContent = formatDuration(eta);
+  $("frameProgress").textContent = `${Number(payload.processed_frames || 0)} / ${Number(payload.total_frames || 0)} 帧`;
+}
+
 function renderHealth(payload) {
   $("runState").textContent = payload.running ? "扫描中" : "待机";
   $("outputSummary").textContent = payload.last_output || state.output || "未生成";
   $("logView").textContent = (payload.logs || []).join("\n");
+  renderProgress(payload);
   if (payload.dependencies) {
     $("dependencyList").innerHTML = payload.dependencies
       .map((dep) => `<div class="dep ${dep.ok ? "ok" : "bad"}"><span>${dep.name}</span><strong>${dep.ok ? "OK" : dep.detail}</strong></div>`)
@@ -45,10 +93,12 @@ function renderCandidates() {
     .map((candidate, index) => {
       const selected = state.selected === index ? " selected" : "";
       const review = state.reviews.get(candidate.candidate_id) || candidate.state || "unreviewed";
+      const category = suspicionCategory(candidate.score);
       return `<article class="candidate-card${selected}" data-index="${index}">
         <img src="${mediaUrl(candidate.image_relpath)}" alt="">
         <div class="meta">
-          <strong>${candidate.timestamp_seconds.toFixed(3)}s · score ${candidate.score.toFixed(2)}</strong>
+          <strong>${formatVideoTime(candidate.timestamp_seconds)} · ${candidate.score.toFixed(2)}</strong>
+          <span class="score-badge ${category.className}">${category.label}</span>
           <span>${review}</span>
         </div>
       </article>`;
@@ -63,12 +113,15 @@ function renderCandidates() {
 function selectCandidate(index) {
   state.selected = index;
   const candidate = state.candidates[index];
+  const category = suspicionCategory(candidate.score);
   $("detailImage").src = mediaUrl(candidate.image_relpath);
   $("detailVideo").src = mediaUrl(candidate.clip_relpath);
   $("detailMeta").innerHTML = `
     <strong>${candidate.video}</strong><br>
-    时间 ${candidate.timestamp_seconds.toFixed(3)}s<br>
-    片段 ${candidate.clip_start_seconds.toFixed(3)}s - ${candidate.clip_end_seconds.toFixed(3)}s<br>
+    <span class="score-badge ${category.className}">${category.label}</span><br>
+    时间 ${formatVideoTime(candidate.timestamp_seconds)}<br>
+    片段 ${formatClipWindow(candidate.clip_start_seconds, candidate.clip_end_seconds)}<br>
+    评分 ${candidate.score.toFixed(2)}<br>
     红像素 ${candidate.red_pixels} · 强度 ${candidate.red_strength.toFixed(1)}
   `;
   renderCandidates();

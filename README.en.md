@@ -31,6 +31,9 @@ The interface includes:
 - Precise screening / high-recall screening
 - Candidate frame grid
 - Candidate clip playback
+- Scan progress, elapsed time, and estimated remaining time
+- Original-video timeline display for clips, such as `3:12-3:14`
+- Score guide with high / medium / low suspected-target categories
 - Confirm / suspected / exclude manual review
 - Open report / open result directory
 
@@ -39,7 +42,7 @@ The interface includes:
 Download from the **Releases** section (right side or bottom of the page):
 
 ```text
-red-sprite-filter-1.0.1.dmg
+red-sprite-filter-1.0.3.dmg
 ```
 
 Open the DMG and drag the app (`红色精灵筛选器.app`, shown as "Red Sprite Filter") to Applications or any folder.
@@ -98,6 +101,16 @@ Recommended parameters:
 - Min red pixels: 8
 
 After pre-screening, re-run suspicious videos in Precise mode.
+
+## Score guide and categories
+
+Candidates are labeled by review priority:
+
+- `≥ 5.0`: highly suspected target
+- `1.0 - 5.0`: medium suspected target
+- `< 1.0`: low suspected target
+
+The category is only a review-priority hint, not a final scientific conclusion. Please confirm with the keyframe, exported clip, and original video.
 
 ## How to tell if a candidate is a red sprite
 

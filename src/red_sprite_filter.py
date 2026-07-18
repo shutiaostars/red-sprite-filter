@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import glob
 import html
 import json
 import math
@@ -11,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -19,6 +21,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v", ".mts", ".m2ts", ".mkv", ".avi"}
+PROGRESS_PREFIX = "PROGRESS_JSON "
 
 
 @dataclass(frozen=True)
@@ -67,6 +70,73 @@ class VideoInfo:
     duration: float
 
 
+class ProgressReporter:
+    def __init__(
+        self,
+        enabled: bool,
+        total_work_frames: int,
+        stream=None,
+        clock=None,
+        min_interval: float = 0.5,
+    ) -> None:
+        self.enabled = enabled
+        self.total_work_frames = max(1, int(total_work_frames))
+        self.stream = stream or sys.stdout
+        self.clock = clock or time.monotonic
+        self.min_interval = min_interval
+        self.started_at = float(self.clock())
+        self.last_emit_at = self.started_at
+
+    def emit(
+        self,
+        *,
+        current_video: Path | str,
+        video_index: int,
+        total_videos: int,
+        processed_frames: int,
+        total_frames: int,
+        completed_work_frames: int,
+        force: bool = False,
+    ) -> None:
+        if not self.enabled:
+            return
+
+        now = float(self.clock())
+        if not force and now - self.last_emit_at < self.min_interval:
+            return
+        self.last_emit_at = now
+
+        total_frames = max(1, int(total_frames))
+        processed_frames = max(0, min(int(processed_frames), total_frames))
+        total_processed = max(0, min(self.total_work_frames, int(completed_work_frames) + processed_frames))
+        progress_percent = round((total_processed / self.total_work_frames) * 100.0, 2)
+        elapsed_seconds = max(0.0, now - self.started_at)
+        eta_seconds = None
+        if total_processed > 0 and elapsed_seconds > 0:
+            frames_per_second = total_processed / elapsed_seconds
+            eta_seconds = max(0.0, (self.total_work_frames - total_processed) / frames_per_second)
+
+        video_name = Path(current_video).name if str(current_video) else ""
+        payload = {
+            "progress_percent": progress_percent,
+            "elapsed_seconds": round(elapsed_seconds, 6),
+            "eta_seconds": round(eta_seconds, 6) if eta_seconds is not None else None,
+            "current_video": video_name,
+            "video_index": int(video_index),
+            "total_videos": int(total_videos),
+            "processed_frames": processed_frames,
+            "total_frames": total_frames,
+        }
+        print(PROGRESS_PREFIX + json.dumps(payload, ensure_ascii=False), file=self.stream, flush=True)
+
+
+def estimated_scan_frames(info: VideoInfo, sample_fps: float) -> int:
+    effective_fps = sample_fps if sample_fps > 0 else info.fps
+    if effective_fps <= 0 or info.duration <= 0:
+        return 1
+    return max(1, int(math.ceil(info.duration * effective_fps)))
+
+
 def safe_stem(path: Path) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "_", path.stem).strip("_") or "video"
 
@@ -83,10 +153,10 @@ def discover_videos(inputs: list[str]) -> list[Path]:
             )
         elif path.is_file() and path.suffix.lower() in VIDEO_EXTENSIONS:
             videos.append(path)
-        else:
+        elif glob.has_magic(str(path)):
             videos.extend(
                 child
-                for child in sorted(Path().glob(raw_input))
+                for child in sorted(Path(match) for match in glob.glob(str(path), recursive=True))
                 if child.is_file() and child.suffix.lower() in VIDEO_EXTENSIONS
             )
 
@@ -794,11 +864,17 @@ def scan_video(
     scan_width: int,
     sample_fps: float,
     score_mode: str,
+    progress_reporter: ProgressReporter | None = None,
+    video_index: int = 1,
+    total_videos: int = 1,
+    completed_work_frames: int = 0,
+    total_scan_frames: int | None = None,
 ) -> list[FrameScore]:
     width = min(scan_width, info.width)
     height = max(2, int(round(info.height * width / info.width)))
     if height % 2:
         height += 1
+    total_scan_frames = total_scan_frames or estimated_scan_frames(info, sample_fps)
 
     filters = []
     effective_fps = info.fps
@@ -830,6 +906,16 @@ def scan_video(
     scores: list[FrameScore] = []
     frame_index = 0
     previous_frame: np.ndarray | None = None
+    if progress_reporter:
+        progress_reporter.emit(
+            current_video=video,
+            video_index=video_index,
+            total_videos=total_videos,
+            processed_frames=0,
+            total_frames=total_scan_frames,
+            completed_work_frames=completed_work_frames,
+            force=True,
+        )
     while True:
         buf = proc.stdout.read(frame_size)
         if not buf:
@@ -859,11 +945,30 @@ def scan_video(
             )
         )
         frame_index += 1
+        if progress_reporter:
+            progress_reporter.emit(
+                current_video=video,
+                video_index=video_index,
+                total_videos=total_videos,
+                processed_frames=frame_index,
+                total_frames=total_scan_frames,
+                completed_work_frames=completed_work_frames,
+            )
 
     stderr = proc.stderr.read().decode("utf-8", errors="replace") if proc.stderr else ""
     ret = proc.wait()
     if ret != 0:
         raise RuntimeError(f"ffmpeg scan failed for {video}: {stderr.strip()}")
+    if progress_reporter:
+        progress_reporter.emit(
+            current_video=video,
+            video_index=video_index,
+            total_videos=total_videos,
+            processed_frames=total_scan_frames,
+            total_frames=total_scan_frames,
+            completed_work_frames=completed_work_frames,
+            force=True,
+        )
     return scores
 
 
@@ -999,10 +1104,32 @@ def config_from_args(args: argparse.Namespace) -> DetectionConfig:
     )
 
 
-def process_video(video: Path, out_dir: Path, args: argparse.Namespace) -> list[CandidateEvent]:
-    info = ffprobe_info(video)
+def process_video(
+    video: Path,
+    out_dir: Path,
+    args: argparse.Namespace,
+    info: VideoInfo | None = None,
+    progress_reporter: ProgressReporter | None = None,
+    video_index: int = 1,
+    total_videos: int = 1,
+    completed_work_frames: int = 0,
+) -> list[CandidateEvent]:
+    info = info or ffprobe_info(video)
     config = config_from_args(args)
-    scores = scan_video(video, info, config, args.scan_width, args.sample_fps, args.score_mode)
+    total_scan_frames = estimated_scan_frames(info, args.sample_fps)
+    scores = scan_video(
+        video,
+        info,
+        config,
+        args.scan_width,
+        args.sample_fps,
+        args.score_mode,
+        progress_reporter=progress_reporter,
+        video_index=video_index,
+        total_videos=total_videos,
+        completed_work_frames=completed_work_frames,
+        total_scan_frames=total_scan_frames,
+    )
     picked = pick_events(
         scores,
         max_events=args.max_candidates,
@@ -1059,15 +1186,41 @@ def run_batch(args: argparse.Namespace) -> int:
 
     all_events: list[CandidateEvent] = []
     failures: list[str] = []
+    video_infos: list[tuple[Path, VideoInfo]] = []
     for video in videos:
-        print(f"Scanning {video}")
         try:
-            events = process_video(video, out_dir, args)
+            video_infos.append((video, ffprobe_info(video)))
         except Exception as exc:
             failures.append(f"{video}: {exc}")
             print(f"  failed: {exc}", file=sys.stderr)
+
+    total_work_frames = sum(
+        estimated_scan_frames(info, args.sample_fps) for _, info in video_infos
+    ) or 1
+    progress_reporter = ProgressReporter(args.progress_json, total_work_frames)
+    completed_work_frames = 0
+    total_videos = len(video_infos)
+    for video_index, (video, info) in enumerate(video_infos, start=1):
+        video_frames = estimated_scan_frames(info, args.sample_fps)
+        print(f"Scanning {video}")
+        try:
+            events = process_video(
+                video,
+                out_dir,
+                args,
+                info=info,
+                progress_reporter=progress_reporter,
+                video_index=video_index,
+                total_videos=total_videos,
+                completed_work_frames=completed_work_frames,
+            )
+        except Exception as exc:
+            failures.append(f"{video}: {exc}")
+            print(f"  failed: {exc}", file=sys.stderr)
+            completed_work_frames += video_frames
             continue
         all_events.extend(events)
+        completed_work_frames += video_frames
         print(f"  exported {len(events)} event(s)")
 
     write_csv(all_events, out_dir / "candidates.csv")
@@ -1108,6 +1261,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--pre-seconds", type=float, default=1.0, help="Seconds before event in clips.")
     parser.add_argument("--post-seconds", type=float, default=2.0, help="Seconds after event in clips.")
     parser.add_argument("--clip-format", choices=["mp4", "mov"], default="mp4", help="Exported clip format.")
+    parser.add_argument("--progress-json", action="store_true", help="Emit machine-readable scan progress events.")
     parser.add_argument(
         "--score-mode",
         choices=["precision", "recall"],
