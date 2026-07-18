@@ -11,10 +11,11 @@ import build_app
 
 
 ROOT = Path(__file__).resolve().parents[1]
+VERSION = build_app.VERSION
 OUTPUTS = ROOT / "outputs"
 APP = OUTPUTS / "红色精灵筛选器.app"
 DMG = OUTPUTS / "红色精灵筛选器.dmg"
-RELEASE_DMG = OUTPUTS / "red-sprite-filter-1.0.0.dmg"
+RELEASE_DMG = OUTPUTS / f"red-sprite-filter-{VERSION}.dmg"
 GITHUB_PUBLISH = OUTPUTS / "github_publish"
 NOTES = OUTPUTS / "GITHUB_RELEASE_NOTES.md"
 
@@ -29,17 +30,17 @@ def sha256(path: Path) -> str:
 
 def write_release_notes(digest: str) -> None:
     NOTES.write_text(
-        f"""# 红色精灵筛选器 v1.0.0
+        f"""# 红色精灵筛选器 v{VERSION}
 
 ## 下载
 
 请下载本 Release 附件：
 
 ```text
-red-sprite-filter-1.0.0.dmg
+{RELEASE_DMG.name}
 ```
 
-这个文件可上传到 GitHub Releases，供其他用户下载。
+这个文件可上传到 GitHub Releases，供其他用户下载。本版本修复了其他电脑上扫描时报 `ModuleNotFoundError: No module named 'numpy'` 的问题。
 
 SHA-256:
 
@@ -57,29 +58,28 @@ SHA-256:
 - 支持人工标记：确认、疑似、排除
 - 支持导出确认候选列表
 - macOS 原生独立窗口，不再跳转系统浏览器
+- App 内置 `numpy` 和 `Pillow`，不再要求用户手动安装 Python 包
 
 ## 安装方法
 
-1. 下载 `red-sprite-filter-1.0.0.dmg`
+1. 下载 `{RELEASE_DMG.name}`
 2. 打开 DMG
 3. 将 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹
 4. 右键 App，选择“打开”
 
 ## 依赖要求
 
-当前版本需要本机已安装：
+当前 macOS App 已内置 `numpy` 和 `Pillow`，不需要用户手动安装 Python 包。
 
-- `python3`
+目标电脑仍需要安装：
+
 - `ffmpeg`
 - `ffprobe`
-- `numpy`
-- `Pillow`
 
 推荐安装命令：
 
 ```bash
 brew install ffmpeg
-python3 -m pip install numpy Pillow
 ```
 
 ## macOS 安全提示
@@ -114,7 +114,7 @@ def refresh_github_publish_files(digest: str) -> None:
 
     shutil.copy2(RELEASE_DMG, GITHUB_PUBLISH / RELEASE_DMG.name)
     (GITHUB_PUBLISH / "CHECKSUMS.txt").write_text(f"{digest}  {RELEASE_DMG.name}\n", encoding="utf-8")
-    for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.0*.md"):
+    for path in GITHUB_PUBLISH.glob(f"RELEASE_v{VERSION}*.md"):
         text = path.read_text(encoding="utf-8")
         path.write_text(re.sub(r"[0-9a-f]{64}", digest, text), encoding="utf-8")
 

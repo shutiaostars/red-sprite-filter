@@ -39,7 +39,7 @@
 到右侧或页面下方的 **Releases** 中下载：
 
 ```text
-red-sprite-filter-1.0.0.dmg
+red-sprite-filter-1.0.1.dmg
 ```
 
 下载后打开 DMG，把 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹即可。
@@ -56,19 +56,17 @@ red-sprite-filter-1.0.0.dmg
 
 ## 依赖
 
-当前版本为了保持包体较小，仍使用目标电脑上的本地运行环境。需要：
+当前 macOS App 已内置 `numpy` 和 `Pillow`，不需要用户手动安装 Python 包。
 
-- `python3`
+目标电脑仍需要安装：
+
 - `ffmpeg`
 - `ffprobe`
-- `numpy`
-- `Pillow`
 
 推荐用 Homebrew 安装：
 
 ```bash
 brew install ffmpeg
-python3 -m pip install numpy Pillow
 ```
 
 App 启动后会自动检查依赖状态。如果看到 `ffmpeg not found` 或 `ffprobe not found`，请先确认 Homebrew 已安装 `ffmpeg`。
@@ -130,9 +128,8 @@ App 启动后会自动检查依赖状态。如果看到 `ffmpeg not found` 或 `
 
 ## 未来计划
 
-- 内置 Python 与 ffmpeg，降低安装门槛
+- 内置 ffmpeg，进一步降低安装门槛
 - Apple Developer ID 签名与公证
 - 支持更细的时间范围扫描
 - 增加批量结果汇总视图
 - 引入更多真实样本校准筛选阈值
-

@@ -33,6 +33,7 @@ final class RedSpriteAppDelegate: NSObject, NSApplicationDelegate, NSWindowDeleg
         }
 
         let appResourcePath = URL(fileURLWithPath: resourcePath).appendingPathComponent("app")
+        let pythonLibPath = URL(fileURLWithPath: resourcePath).appendingPathComponent("python_lib")
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
         process.currentDirectoryURL = appResourcePath
@@ -43,6 +44,11 @@ final class RedSpriteAppDelegate: NSObject, NSApplicationDelegate, NSWindowDeleg
             environment["PATH"] = "\(toolPath):\(existingPath)"
         } else {
             environment["PATH"] = toolPath
+        }
+        if let existingPythonPath = environment["PYTHONPATH"], !existingPythonPath.isEmpty {
+            environment["PYTHONPATH"] = "\(pythonLibPath.path):\(appResourcePath.path):\(existingPythonPath)"
+        } else {
+            environment["PYTHONPATH"] = "\(pythonLibPath.path):\(appResourcePath.path)"
         }
         process.environment = environment
 
@@ -55,7 +61,7 @@ final class RedSpriteAppDelegate: NSObject, NSApplicationDelegate, NSWindowDeleg
         backendProcess = process
 
         let handle = outputPipe.fileHandleForReading
-        let deadline = Date().addingTimeInterval(8)
+        let deadline = Date().addingTimeInterval(20)
         var buffer = Data()
 
         while Date() < deadline {

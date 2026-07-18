@@ -39,7 +39,7 @@ Die Oberfläche umfasst:
 Lade aus dem Bereich **Releases** (rechts oder unten auf der Seite) herunter:
 
 ```text
-red-sprite-filter-1.0.0.dmg
+red-sprite-filter-1.0.1.dmg
 ```
 
 Öffne die DMG und ziehe die App (`红色精灵筛选器.app`, angezeigt als "Red Sprite Filter") in die Programme oder einen beliebigen Ordner.
@@ -56,19 +56,17 @@ So öffnest du sie:
 
 ## Abhängigkeiten
 
-Um das Paket klein zu halten, nutzt die aktuelle Version die lokale Laufzeitumgebung des Ziel-Macs wieder. Du benötigst:
+Die macOS-App enthält jetzt `numpy` und `Pillow`, sodass Benutzer keine Python-Pakete manuell installieren müssen.
 
-- `python3`
+Der Ziel-Mac benötigt weiterhin:
+
 - `ffmpeg`
 - `ffprobe`
-- `numpy`
-- `Pillow`
 
 Empfohlene Installation via Homebrew:
 
 ```bash
 brew install ffmpeg
-python3 -m pip install numpy Pillow
 ```
 
 Die App prüft die Abhängigkeiten beim Start. Wenn du `ffmpeg not found` oder `ffprobe not found` siehst, stelle sicher, dass `ffmpeg` über Homebrew installiert ist.
@@ -130,7 +128,7 @@ Dies ist eine frühe öffentliche Version eines Foto-Workflow-Werkzeugs. Es dien
 
 ## Roadmap
 
-- Python und ffmpeg einbetten, um die Einstiegshürde zu senken
+- ffmpeg einbetten, um die Einstiegshürde zu senken
 - Signierung und Notarisierung mit Apple Developer ID
 - Scan feinerer Zeitbereiche unterstützen
 - eine Zusammenfassungsansicht für Stapelergebnisse hinzufügen

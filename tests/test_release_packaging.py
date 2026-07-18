@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DMG = ROOT / "outputs" / "红色精灵筛选器.dmg"
-RELEASE_DMG = ROOT / "outputs" / "red-sprite-filter-1.0.0.dmg"
+RELEASE_DMG = ROOT / "outputs" / "red-sprite-filter-1.0.1.dmg"
 GITHUB_PUBLISH = ROOT / "outputs" / "github_publish"
 NOTES = ROOT / "outputs" / "GITHUB_RELEASE_NOTES.md"
 
@@ -41,7 +41,7 @@ class ReleasePackagingTests(unittest.TestCase):
         digest = hashlib.sha256(RELEASE_DMG.read_bytes()).hexdigest()
 
         self.assertEqual((GITHUB_PUBLISH / "CHECKSUMS.txt").read_text(encoding="utf-8"), f"{digest}  {RELEASE_DMG.name}\n")
-        for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.0*.md"):
+        for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.1*.md"):
             self.assertIn(digest, path.read_text(encoding="utf-8"), str(path))
 
 
