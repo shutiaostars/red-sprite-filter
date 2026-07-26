@@ -33,6 +33,7 @@ The interface includes:
 - Candidate frame grid
 - Candidate clip playback
 - Scan progress, elapsed time, and estimated remaining time
+- No repeated console windows while scanning on Windows
 - Original-video timeline display for clips, such as `3:12-3:14`
 - Score guide with high / medium / low suspected-target categories
 - Confirm / suspected / exclude manual review
@@ -43,7 +44,7 @@ The interface includes:
 Download from the **Releases** section (right side or bottom of the page):
 
 ```text
-macOS:   red-sprite-filter-1.0.4.dmg
+macOS:   red-sprite-filter-1.0.5.dmg
 Windows: red-sprite-filter-setup.exe
 ```
 

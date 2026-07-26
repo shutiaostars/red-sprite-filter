@@ -46,6 +46,16 @@ class WindowsPackagingTests(unittest.TestCase):
         self.assertIn("red-sprite-filter-windows-installer", workflow)
         self.assertIn("red-sprite-filter-setup.exe", workflow)
 
+    def test_windows_build_version_is_1_0_5_everywhere(self):
+        workflow = (ROOT / ".github" / "workflows" / "build-windows.yml").read_text(encoding="utf-8")
+        build_script = (ROOT / "windows" / "build_windows.ps1").read_text(encoding="utf-8")
+        installer = (ROOT / "windows" / "red_sprite_filter.iss").read_text(encoding="utf-8")
+
+        self.assertIn('default: "1.0.5"', workflow)
+        self.assertIn('$version = "1.0.5"', workflow)
+        self.assertIn('[string]$Version = "1.0.5"', build_script)
+        self.assertIn('#define MyAppVersion "1.0.5"', installer)
+
     def test_readme_mentions_windows_installer_download(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         english = (ROOT / "README.en.md").read_text(encoding="utf-8")

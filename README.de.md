@@ -42,7 +42,7 @@ Die Oberfläche umfasst:
 Lade aus dem Bereich **Releases** (rechts oder unten auf der Seite) herunter:
 
 ```text
-red-sprite-filter-1.0.4.dmg
+red-sprite-filter-1.0.5.dmg
 ```
 
 Öffne die DMG und ziehe die App (`红色精灵筛选器.app`, angezeigt als "Red Sprite Filter") in die Programme oder einen beliebigen Ordner.

@@ -33,6 +33,7 @@
 - 候选帧网格
 - 候选片段播放
 - 扫描进度、已花费时间、预计剩余时间
+- Windows 扫描期间不显示反复弹出的黑色终端窗口
 - 原视频时间轴片段显示，例如 `3:12-3:14`
 - 评分标准与高度疑似目标 / 中等疑似目标 / 低疑似目标分类
 - 确认 / 疑似 / 排除人工复核
@@ -43,7 +44,7 @@
 到右侧或页面下方的 **Releases** 中下载：
 
 ```text
-macOS:   red-sprite-filter-1.0.4.dmg
+macOS:   red-sprite-filter-1.0.5.dmg
 Windows: red-sprite-filter-setup.exe
 ```
 

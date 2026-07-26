@@ -1,7 +1,9 @@
+import io
 import tempfile
 import sys
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
@@ -233,6 +235,40 @@ class RedSpriteFilterTests(unittest.TestCase):
             settings = out / "settings.json"
             self.assertTrue(settings.exists())
             self.assertIn('"score_mode": "precision"', settings.read_text(encoding="utf-8"))
+
+    def test_run_command_hides_console_window_on_windows(self):
+        with patch.object(rsf.sys, "platform", "win32"), patch.object(
+            rsf.subprocess, "CREATE_NO_WINDOW", 0x08000000, create=True
+        ), patch.object(rsf.subprocess, "run") as run:
+            rsf.run_command(["ffprobe", "-version"])
+
+        run.assert_called_once_with(
+            ["ffprobe", "-version"],
+            text=True,
+            stdout=rsf.subprocess.PIPE,
+            stderr=rsf.subprocess.PIPE,
+            creationflags=0x08000000,
+        )
+
+    def test_scan_video_hides_ffmpeg_console_window_on_windows(self):
+        process = SimpleNamespace(
+            stdout=io.BytesIO(),
+            stderr=io.BytesIO(),
+            wait=lambda: 0,
+        )
+        with patch.object(rsf.sys, "platform", "win32"), patch.object(
+            rsf.subprocess, "CREATE_NO_WINDOW", 0x08000000, create=True
+        ), patch.object(rsf.subprocess, "Popen", return_value=process) as popen:
+            rsf.scan_video(
+                Path("sprites.mov"),
+                rsf.VideoInfo(width=2, height=2, fps=30.0, duration=1.0),
+                rsf.DetectionConfig(),
+                scan_width=2,
+                sample_fps=0.0,
+                score_mode="precision",
+            )
+
+        self.assertEqual(popen.call_args.kwargs.get("creationflags"), 0x08000000)
 
 
 if __name__ == "__main__":

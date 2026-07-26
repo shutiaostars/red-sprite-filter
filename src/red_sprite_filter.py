@@ -823,8 +823,20 @@ def rank_indices_by_positive_similarity(
     return [index for _, index in sorted(scored, key=lambda item: item[0], reverse=True)]
 
 
+def subprocess_window_kwargs() -> dict[str, int]:
+    if sys.platform != "win32":
+        return {}
+    return {"creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)}
+
+
 def run_command(cmd: list[str]) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return subprocess.run(
+        cmd,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        **subprocess_window_kwargs(),
+    )
 
 
 def ffprobe_info(video: Path) -> VideoInfo:
@@ -898,7 +910,12 @@ def scan_video(
         "rgb24",
         "-",
     ]
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        **subprocess_window_kwargs(),
+    )
     if proc.stdout is None:
         raise RuntimeError("ffmpeg stdout was not available")
 
