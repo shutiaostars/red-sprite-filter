@@ -2,8 +2,12 @@ import plistlib
 import hashlib
 import subprocess
 import sys
+import tempfile
+import time
 import unittest
 from pathlib import Path
+
+from tests.macos_runtime_probe import run_runtime_probe
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +52,72 @@ class ReleasePackagingTests(unittest.TestCase):
         self.assertEqual((GITHUB_PUBLISH / "CHECKSUMS.txt").read_text(encoding="utf-8"), f"{digest}  {RELEASE_DMG.name}\n")
         for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.6*.md"):
             self.assertIn(digest, path.read_text(encoding="utf-8"), str(path))
+
+    def test_mounted_dmg_uses_self_contained_runtime(self):
+        attach = subprocess.run(
+            ["hdiutil", "attach", "-readonly", "-nobrowse", "-plist", str(DMG)],
+            check=True,
+            stdout=subprocess.PIPE,
+        )
+        payload = plistlib.loads(attach.stdout)
+        mount_point = next(
+            Path(entity["mount-point"])
+            for entity in payload["system-entities"]
+            if "mount-point" in entity
+        )
+        self.addCleanup(
+            subprocess.run,
+            ["hdiutil", "detach", str(mount_point)],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        app = mount_point / "红色精灵筛选器.app"
+        resources = app / "Contents" / "Resources"
+        with tempfile.TemporaryDirectory() as td:
+            result = run_runtime_probe(resources, Path(td))
+            self.assertGreater(result["duration"], 1.5)
+            self.assertTrue(result["report"].exists())
+            self.assertTrue(result["clips"], result)
+
+        with tempfile.TemporaryDirectory() as launcher_home:
+            launcher = subprocess.Popen(
+                [str(app / "Contents" / "MacOS" / "red-sprite-filter")],
+                env={"PATH": "/usr/bin:/bin", "HOME": launcher_home},
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            try:
+                deadline = time.time() + 20
+                backend_command = ""
+                while time.time() < deadline and launcher.poll() is None:
+                    children = subprocess.run(
+                        ["pgrep", "-P", str(launcher.pid)],
+                        check=False,
+                        text=True,
+                        stdout=subprocess.PIPE,
+                    ).stdout.split()
+                    for pid in children:
+                        command = subprocess.run(
+                            ["ps", "-o", "command=", "-p", pid],
+                            check=True,
+                            text=True,
+                            stdout=subprocess.PIPE,
+                        ).stdout
+                        if "red_sprite_app.backend" in command:
+                            backend_command = command
+                            break
+                    if backend_command:
+                        break
+                    time.sleep(0.25)
+                self.assertIn("runtime/python/bin/python3", backend_command)
+                self.assertIn("red_sprite_app.backend", backend_command)
+            finally:
+                launcher.terminate()
+                launcher.wait(timeout=10)
+                if launcher.stderr:
+                    launcher.stderr.close()
 
 
 if __name__ == "__main__":
