@@ -138,6 +138,60 @@ Common false positives include:
 - Large exposure changes
 - Fixed hot pixels or compression noise
 
+## Scientific basis and references
+
+The tool combines published research with public NOAA and NASA observation material, translating the visible characteristics below into candidate scores. It is a **rule-based candidate screening tool**, not a scientifically calibrated confirmation system. Scores and high/medium/low suspicion labels only set manual-review priority. Thresholds in the code are engineering values tuned for camera footage, not physical constants taken from the papers.
+
+### 1. High-altitude position above thunderstorms
+
+The Sprites94 aircraft observations by Sentman et al. describe red sprites as high-altitude luminous events above thunderstorms. The tool therefore prioritizes the upper frame and regions above cloud tops while reducing the weight of the horizon, urban light bands, and fixed near-ground lights.
+
+- Sentman, D. D. et al. (1995), *Preliminary results from the Sprites94 Aircraft Campaign: 1. Red sprites*, Geophysical Research Letters, 22(10), 1205-1208.
+  https://doi.org/10.1029/95GL00583
+
+### 2. Red or magenta spectral signature
+
+Spectroscopic observations identify molecular nitrogen first-positive-band emissions as a major component of sprite light. The tool scores red excess over green and blue plus the local red-pixel ratio, while penalizing the broad white or near-neutral brightening typical of ordinary lightning.
+
+- Hampton, D. L. et al. (1996), *Optical spectral characteristics of sprites*, Geophysical Research Letters, 23(1), 89-92.
+  https://doi.org/10.1029/95GL03587
+- Mende, S. B. et al. (1995), *Sprite spectra: N2 1PG band identification*, Geophysical Research Letters, 22(19), 2633-2636.
+  https://doi.org/10.1029/95GL02827
+
+### 3. High-altitude discharge associated with thunderstorms
+
+Pasko et al. discuss electrical discharge extending from a thundercloud top toward the lower ionosphere. The tool uses the spatial combination of an elevated, localized event above active storm clouds as supporting evidence instead of confirming a target from red color alone.
+
+- Pasko, V. P. et al. (2002), *Electrical discharge from a thundercloud top to the lower ionosphere*, Nature, 416, 152-154.
+  https://doi.org/10.1038/416152a
+
+### 4. Millisecond, frame-to-frame transient behavior
+
+High-speed imaging shows that sprite, halo, and related structures develop rapidly on millisecond time scales. The tool compares red excess and structural changes between neighboring frames, prioritizing brief localized appearances and suppressing persistent sources such as city lights, vehicle lights, tower lights, and hot pixels.
+
+- Moudry, D. R. et al. (2003), *Imaging of elves, halos and sprite initiation at 1 ms time resolution*, Journal of Atmospheric and Solar-Terrestrial Physics, 65(5), 509-518.
+  https://doi.org/10.1016/S1364-6826(02)00323-1
+
+### 5. Vertical streamers, columns, tendrils, and branches
+
+High-speed observations show rapidly developing streamers along with columnar, carrot-shaped, tendril-like, and branching structures. The tool rewards elevated, narrow, vertically extended red components and groups of nearby components, while penalizing broad horizon bands and whole-frame exposure changes.
+
+- Stenbaek-Nielsen, H. C. et al. (2013), *High-Speed Observations of Sprite Streamers*, Surveys in Geophysics, 34, 769-795.
+  https://doi.org/10.1007/s10712-013-9224-4
+
+### 6. Public NOAA and NASA observation guidance
+
+NOAA and NASA describe red sprites as brief, predominantly red transient luminous events above thunderstorms that can appear jellyfish-shaped, carrot-shaped, or columnar. These sources provide a cross-check for the visible features and manual-review guidance used for photographic video.
+
+- NOAA NSSL, *Lightning Types: Transient Luminous Events*
+  https://www.nssl.noaa.gov/education/svrwx101/lightning/types/
+- NASA Science, *Spritacular*
+  https://science.nasa.gov/citizen-science/spritacular/
+- NASA Scientific Visualization Studio, *The Elusive Red Sprite*
+  https://svs.gsfc.nasa.gov/11059
+- NASA Scientific Visualization Studio, *Elusive Sprite Captured from the International Space Station*
+  https://svs.gsfc.nasa.gov/31111/
+
 ## Privacy
 
 All video is processed locally on your machine. The tool never uploads video, frames, candidate clips, or path information.

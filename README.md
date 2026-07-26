@@ -138,6 +138,60 @@ Windows 安装包会随程序打包 `ffmpeg`、`ffprobe`、Python 运行时和 P
 - 大面积曝光变化
 - 固定热噪点或压缩噪声
 
+## 科学判断依据与参考文献
+
+本工具综合论文和 NOAA、NASA 的公开观测资料，把下列可见特征转换为候选评分。它是**规则型候选筛选工具**，不是经过专业观测设备标定的科学确认系统；分数和“高度/中等/低度疑似”只代表人工复核优先级。代码中的阈值是针对相机视频进行样本调试后的工程参数，不是论文中的物理常数。
+
+### 1. 位于雷暴云顶上方的高空区域
+
+Sentman 等人的 Sprites94 飞机观测将红色精灵描述为雷暴上方的高空发光事件。工具因此优先检查画面上部和云顶上方区域，并降低地平线、城市灯光带及近地固定光源的权重。
+
+- Sentman, D. D. et al. (1995), *Preliminary results from the Sprites94 Aircraft Campaign: 1. Red sprites*, Geophysical Research Letters, 22(10), 1205-1208.
+  https://doi.org/10.1029/95GL00583
+
+### 2. 红色或品红色光谱特征
+
+光谱观测表明，红色精灵的可见辐射主要与分子氮第一正带系统有关。工具使用红色相对绿色、蓝色的增量和局部红像素比例进行评分，同时惩罚普通闪电常见的白色、近中性色大面积增亮。
+
+- Hampton, D. L. et al. (1996), *Optical spectral characteristics of sprites*, Geophysical Research Letters, 23(1), 89-92.
+  https://doi.org/10.1029/95GL03587
+- Mende, S. B. et al. (1995), *Sprite spectra: N2 1PG band identification*, Geophysical Research Letters, 22(19), 2633-2636.
+  https://doi.org/10.1029/95GL02827
+
+### 3. 雷暴触发的高空放电背景
+
+Pasko 等人讨论了从雷暴云顶向低层电离层发展的高空放电。工具据此把“云顶上方、局部出现、与雷暴活动同场”的空间关系作为辅助特征，而不会仅凭红色就确认目标。
+
+- Pasko, V. P. et al. (2002), *Electrical discharge from a thundercloud top to the lower ionosphere*, Nature, 416, 152-154.
+  https://doi.org/10.1038/416152a
+
+### 4. 毫秒级、帧间突现的瞬态特征
+
+高速成像显示精灵、光晕和相关瞬态结构会在毫秒尺度快速发展。工具比较相邻帧的红色增量和结构变化，优先保留短暂突现的局部目标，并抑制城市灯、车灯、塔灯和热像素等长期稳定光源。
+
+- Moudry, D. R. et al. (2003), *Imaging of elves, halos and sprite initiation at 1 ms time resolution*, Journal of Atmospheric and Solar-Terrestrial Physics, 65(5), 509-518.
+  https://doi.org/10.1016/S1364-6826(02)00323-1
+
+### 5. 竖向流光、柱状、须状和分支形态
+
+高速观测显示红色精灵常包含快速发展的 streamer（流光）以及柱状、胡萝卜状、须状和分支结构。工具会奖励位于高空、较窄、竖向延伸并包含多个相近分量的红色结构，同时惩罚横贯地平线的宽光带和整帧曝光变化。
+
+- Stenbaek-Nielsen, H. C. et al. (2013), *High-Speed Observations of Sprite Streamers*, Surveys in Geophysics, 34, 769-795.
+  https://doi.org/10.1007/s10712-013-9224-4
+
+### 6. NOAA 与 NASA 的公开观测说明
+
+NOAA 和 NASA 的资料将红色精灵概括为雷暴上方、以红色为主、持续短暂，并可能呈水母状、胡萝卜状或柱状的瞬态发光事件。这些资料用于交叉核对软件面向摄影视频的可见特征和人工复核建议。
+
+- NOAA NSSL, *Lightning Types: Transient Luminous Events*
+  https://www.nssl.noaa.gov/education/svrwx101/lightning/types/
+- NASA Science, *Spritacular*
+  https://science.nasa.gov/citizen-science/spritacular/
+- NASA Scientific Visualization Studio, *The Elusive Red Sprite*
+  https://svs.gsfc.nasa.gov/11059
+- NASA Scientific Visualization Studio, *Elusive Sprite Captured from the International Space Station*
+  https://svs.gsfc.nasa.gov/31111/
+
 ## 隐私说明
 
 所有视频都在本机处理。工具不会上传视频、帧图、候选片段或路径信息。
