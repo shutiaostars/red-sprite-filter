@@ -1,5 +1,7 @@
 import plistlib
 import hashlib
+import os
+import signal
 import subprocess
 import sys
 import tempfile
@@ -91,6 +93,7 @@ class ReleasePackagingTests(unittest.TestCase):
             try:
                 deadline = time.time() + 20
                 backend_command = ""
+                backend_pid = None
                 while time.time() < deadline and launcher.poll() is None:
                     children = subprocess.run(
                         ["pgrep", "-P", str(launcher.pid)],
@@ -107,6 +110,7 @@ class ReleasePackagingTests(unittest.TestCase):
                         ).stdout
                         if "red_sprite_app.backend" in command:
                             backend_command = command
+                            backend_pid = int(pid)
                             break
                     if backend_command:
                         break
@@ -115,7 +119,25 @@ class ReleasePackagingTests(unittest.TestCase):
                 self.assertIn("red_sprite_app.backend", backend_command)
             finally:
                 launcher.terminate()
-                launcher.wait(timeout=10)
+                try:
+                    launcher.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    launcher.kill()
+                    launcher.wait(timeout=5)
+                if backend_pid:
+                    try:
+                        os.kill(backend_pid, signal.SIGTERM)
+                    except ProcessLookupError:
+                        pass
+                    else:
+                        for _ in range(50):
+                            try:
+                                os.kill(backend_pid, 0)
+                            except ProcessLookupError:
+                                break
+                            time.sleep(0.1)
+                        else:
+                            os.kill(backend_pid, signal.SIGKILL)
                 if launcher.stderr:
                     launcher.stderr.close()
 
