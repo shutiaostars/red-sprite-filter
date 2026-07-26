@@ -9,6 +9,9 @@ Thumbs.db
 # Internal authoring/publish guide (not intended for the public repo)
 UPLOAD_TO_GITHUB.md
 
+# Isolated feature worktrees
+.worktrees/
+
 # Windows build artifacts (generated locally; not committed)
 src/red_sprite_app/bin/
 src/dist/
