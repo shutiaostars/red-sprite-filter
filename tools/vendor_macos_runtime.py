@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -118,6 +119,60 @@ def install_wheels(python: Path, wheels: list[Path]) -> None:
     )
 
 
+def command_output(*args: str) -> str:
+    return subprocess.run(
+        list(args),
+        check=True,
+        text=True,
+        errors="replace",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    ).stdout
+
+
+def normalize_dylib_ids(site_packages: Path) -> None:
+    for library in site_packages.rglob("*.dylib"):
+        output = command_output("otool", "-D", str(library))
+        install_names = [line.strip() for line in output.splitlines()[1:] if line.strip()]
+        if any(name.startswith("/DLC/") for name in install_names):
+            subprocess.run(
+                [
+                    "install_name_tool",
+                    "-id",
+                    f"@loader_path/{library.name}",
+                    str(library),
+                ],
+                check=True,
+            )
+
+
+def validate_runtime(
+    resources: Path,
+    maximum_macos: tuple[int, int] = (12, 0),
+) -> None:
+    binaries = [
+        resources / "runtime" / "python" / "bin" / "python3",
+        resources / "bin" / "ffmpeg",
+        resources / "bin" / "ffprobe",
+    ]
+    for binary in binaries:
+        architecture = command_output("file", str(binary))
+        if "arm64" not in architecture:
+            raise RuntimeError(f"{binary}: expected arm64, got {architecture.strip()}")
+        build = command_output("vtool", "-show-build", str(binary))
+        match = re.search(r"minos\s+([0-9.]+)", build)
+        if not match:
+            raise RuntimeError(f"{binary}: missing macOS deployment target")
+        minimum = tuple(map(int, match.group(1).split(".")))[:2]
+        if minimum > maximum_macos:
+            raise RuntimeError(f"{binary}: requires macOS {match.group(1)}")
+        linked = command_output("otool", "-L", str(binary))
+        if "/opt/homebrew" in linked or "/usr/local" in linked:
+            raise RuntimeError(
+                f"{binary}: contains external package-manager references"
+            )
+
+
 def copy_license(source: Path, destination: Path) -> None:
     if not source.exists():
         raise RuntimeError(f"Missing license file: {source}")
@@ -149,10 +204,11 @@ def vendor_runtime(resources: Path, cache_dir: Path = DEFAULT_CACHE) -> None:
     extract_python(artifacts["python"], runtime)
     python = runtime / "bin" / "python3"
     install_wheels(python, [artifacts["numpy"], artifacts["pillow"]])
+    site_packages = runtime / "lib" / "python3.12" / "site-packages"
+    normalize_dylib_ids(site_packages)
     extract_zip_member(artifacts["ffmpeg"], "ffmpeg", tools / "ffmpeg")
     extract_zip_member(artifacts["ffprobe"], "ffprobe", tools / "ffprobe")
 
-    site_packages = runtime / "lib" / "python3.12" / "site-packages"
     licenses.mkdir(parents=True)
     copy_license(NOTICES, licenses / "THIRD_PARTY_NOTICES.md")
     copy_license(
@@ -172,3 +228,4 @@ def vendor_runtime(resources: Path, cache_dir: Path = DEFAULT_CACHE) -> None:
     )
     copy_license(pillow_license, licenses / "Pillow-LICENSE.txt")
     remove_python_caches(runtime)
+    validate_runtime(resources)

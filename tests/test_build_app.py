@@ -1,9 +1,13 @@
+import json
 import plistlib
+import re
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+from tests.macos_runtime_probe import run_runtime_probe
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +17,17 @@ RESOURCES = APP / "Contents" / "Resources"
 BUNDLED_PYTHON = RESOURCES / "runtime" / "python" / "bin" / "python3"
 BUNDLED_FFMPEG = RESOURCES / "bin" / "ffmpeg"
 BUNDLED_FFPROBE = RESOURCES / "bin" / "ffprobe"
+
+
+def command_output(*args: str) -> str:
+    return subprocess.run(
+        list(args),
+        check=True,
+        text=True,
+        errors="replace",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    ).stdout
 
 
 class RedSpriteBuildTests(unittest.TestCase):
@@ -119,6 +134,70 @@ class RedSpriteBuildTests(unittest.TestCase):
 
         self.assertIn("macosx_11_0_arm64", wheel_text)
         self.assertNotIn("macosx_14_0_arm64", wheel_text)
+
+    def test_every_packaged_macho_is_arm64_and_supports_macos_12(self):
+        binaries = []
+        for path in APP.rglob("*"):
+            if path.is_file() and "Mach-O" in command_output("file", str(path)):
+                binaries.append(path)
+        self.assertTrue(binaries)
+        for binary in binaries:
+            with self.subTest(binary=binary):
+                self.assertIn("arm64", command_output("file", str(binary)))
+                build = command_output("vtool", "-show-build", str(binary))
+                match = re.search(r"minos\s+([0-9.]+)", build)
+                self.assertIsNotNone(match, build)
+                minimum = tuple(map(int, match.group(1).split(".")))[:2]
+                self.assertLessEqual(minimum, (12, 0))
+
+    def test_packaged_macho_files_have_no_external_package_manager_links(self):
+        for binary in APP.rglob("*"):
+            if not binary.is_file() or "Mach-O" not in command_output("file", str(binary)):
+                continue
+            linked = command_output("otool", "-L", str(binary))
+            self.assertNotIn("/opt/homebrew", linked)
+            self.assertNotIn("/usr/local", linked)
+            for line in linked.splitlines()[1:]:
+                dependency = line.strip().split(" ", 1)[0]
+                if dependency.startswith("/"):
+                    self.assertTrue(
+                        dependency.startswith(("/System/", "/usr/lib/")),
+                        f"{binary}: external dependency {dependency}",
+                    )
+
+    def test_packaged_backend_resolves_only_bundled_third_party_dependencies(self):
+        code = (
+            "import json; "
+            "from red_sprite_app.backend import check_dependencies; "
+            "print(json.dumps(check_dependencies(), ensure_ascii=False))"
+        )
+        result = subprocess.run(
+            [str(BUNDLED_PYTHON), "-c", code],
+            env={
+                "PATH": f"{RESOURCES / 'bin'}:/usr/bin:/bin",
+                "PYTHONPATH": str(RESOURCES / "app"),
+                "PYTHONNOUSERSITE": "1",
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "HOME": tempfile.mkdtemp(),
+            },
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+        )
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["ok"], payload)
+        details = {item["name"]: item["detail"] for item in payload["dependencies"]}
+        self.assertEqual(details["python"], str(BUNDLED_PYTHON))
+        self.assertEqual(details["ffmpeg"], str(BUNDLED_FFMPEG))
+        self.assertEqual(details["ffprobe"], str(BUNDLED_FFPROBE))
+
+    def test_bundled_runtime_processes_video_without_external_dependencies(self):
+        with tempfile.TemporaryDirectory() as td:
+            result = run_runtime_probe(RESOURCES, Path(td))
+
+            self.assertGreater(result["duration"], 1.5)
+            self.assertTrue(result["report"].exists())
+            self.assertTrue(result["clips"], result)
 
     def test_release_dmg_script_exists(self):
         script = ROOT / "tools" / "build_release_dmg.py"

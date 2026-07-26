@@ -81,7 +81,22 @@ def strip_extended_attributes(path: Path) -> None:
 
 
 def sign_app() -> None:
-    subprocess.run(["codesign", "--force", "--deep", "--sign", "-", str(APP)], check=True)
+    for path in APP.rglob("*"):
+        if not path.is_file():
+            continue
+        kind = subprocess.run(
+            ["file", "-b", str(path)],
+            check=True,
+            text=True,
+            errors="replace",
+            stdout=subprocess.PIPE,
+        ).stdout
+        if "Mach-O" in kind:
+            subprocess.run(
+                ["codesign", "--force", "--sign", "-", str(path)],
+                check=True,
+            )
+    subprocess.run(["codesign", "--force", "--sign", "-", str(APP)], check=True)
     subprocess.run(["codesign", "--verify", "--deep", "--strict", "--verbose=2", str(APP)], check=True)
 
 

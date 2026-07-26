@@ -44,6 +44,10 @@ def _default_tool_dirs() -> list[str]:
     if getattr(sys, "_MEIPASS", None):
         dirs.append(sys._MEIPASS)
     exe_dir = Path(sys.executable).parent
+    if len(exe_dir.parents) >= 3:
+        bundled_bin = exe_dir.parents[2] / "bin"
+        if (bundled_bin / "ffmpeg").exists() and (bundled_bin / "ffprobe").exists():
+            dirs.append(str(bundled_bin))
     dirs.append(str(exe_dir / "bin"))
     dirs.append(str(exe_dir))
     if sys.platform == "win32":
