@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -48,6 +49,30 @@ class MacOSRuntimeVendorTests(unittest.TestCase):
             digest = hashlib.sha256(b"valid").hexdigest()
 
             vendor.verify_sha256(artifact, digest, "python")
+
+    def test_vendor_runtime_creates_complete_resource_layout(self):
+        with tempfile.TemporaryDirectory() as td:
+            resources = Path(td) / "Resources"
+            vendor.vendor_runtime(resources)
+
+            expected = [
+                resources / "runtime" / "python" / "bin" / "python3",
+                resources / "runtime" / "python" / "lib" / "python3.12" / "site-packages" / "numpy",
+                resources / "runtime" / "python" / "lib" / "python3.12" / "site-packages" / "PIL",
+                resources / "bin" / "ffmpeg",
+                resources / "bin" / "ffprobe",
+                resources / "licenses" / "THIRD_PARTY_NOTICES.md",
+                resources / "licenses" / "CPython-LICENSE.txt",
+                resources / "licenses" / "FFmpeg-COPYING.GPLv3.txt",
+                resources / "licenses" / "NumPy-LICENSE.txt",
+                resources / "licenses" / "Pillow-LICENSE.txt",
+            ]
+            for path in expected:
+                with self.subTest(path=path):
+                    self.assertTrue(path.exists(), str(path))
+
+            self.assertTrue(os.access(resources / "bin" / "ffmpeg", os.X_OK))
+            self.assertTrue(os.access(resources / "bin" / "ffprobe", os.X_OK))
 
 
 if __name__ == "__main__":
