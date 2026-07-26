@@ -12,6 +12,9 @@ UPLOAD_TO_GITHUB.md
 # Isolated feature worktrees
 .worktrees/
 
+# Pinned macOS runtime downloads
+.cache/macos-runtime/
+
 # Windows build artifacts (generated locally; not committed)
 src/red_sprite_app/bin/
 src/dist/
