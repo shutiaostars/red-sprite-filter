@@ -139,10 +139,17 @@ Alle Videos werden lokal auf deinem Rechner verarbeitet. Das Werkzeug lädt niem
 
 Dies ist eine frühe öffentliche Version eines Foto-Workflow-Werkzeugs. Es dient als Hilfe beim Filtern und ersetzt nicht die manuelle Überprüfung. Issues und Feedback sind willkommen — Falschmeldungen, übersehene Treffer, Verhalten bei verschiedenen Kameramodellen und Funktionsvorschläge.
 
-## Roadmap
+## Kürzlich abgeschlossen
 
-- ffmpeg einbetten, um die Einstiegshürde zu senken
-- Signierung und Notarisierung mit Apple Developer ID
-- Scan feinerer Zeitbereiche unterstützen
-- eine Zusammenfassungsansicht für Stapelergebnisse hinzufügen
-- Filter-Schwellenwerte mit mehr echten Samples kalibrieren
+- Der Windows-Installer enthält jetzt `ffmpeg`, `ffprobe`, die Python-Laufzeit und alle Abhängigkeiten; beim Scannen öffnen sich keine wiederholten Konsolenfenster mehr
+- Der vollständige Videoscan behält mehrere unabhängige Ereignisse oberhalb des Schwellenwerts, einschließlich aufeinanderfolgender Sprites
+- Ordner-Stapelscans bündeln Kandidatenliste, Keyframes, Ereignisclips, CSV, Kontaktbogen und HTML-Bericht
+- Scan-Fortschritt, verstrichene Zeit, geschätzte Restzeit, Originalvideo-Zeitangaben, Verdachtsstufen und manuelle Überprüfung wurden ergänzt
+
+## Nächste Schritte
+
+- `ffmpeg` und `ffprobe` in das macOS-Paket integrieren und die Homebrew-Abhängigkeit entfernen
+- Signierung und Notarisierung mit Apple Developer ID abschließen
+- Start- und Endzeit des Scans sowie den Himmelsbereich auswählbar machen
+- Stapelstatistiken, Kandidatenfilter, Sortierung und Zusammenfassungsexport ausbauen
+- Schwellenwerte mit mehr gekennzeichneten realen Samples kalibrieren und Precision-/Recall-Ergebnisse veröffentlichen

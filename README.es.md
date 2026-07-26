@@ -139,10 +139,17 @@ Todo el vídeo se procesa localmente en tu equipo. La herramienta nunca sube ví
 
 Esta es una versión pública temprana de una herramienta de flujo de trabajo fotográfico. Está pensada para ayudar a cribar, no para sustituir la revisión manual. Se agradecen los issue y comentarios: falsos positivos, detecciones fallidas, comportamiento con distintos modelos de cámara y sugerencias de funciones.
 
-## Hoja de ruta
+## Mejoras completadas recientemente
 
-- Incluir ffmpeg para reducir la barrera de instalación
-- Firma y notarización con Apple Developer ID
-- Soporte para un escaneo de rangos de tiempo más fino
-- Añadir una vista de resumen de resultados en lote
-- Calibrar los umbrales de cribado con más muestras reales
+- El instalador de Windows ya incluye `ffmpeg`, `ffprobe`, el entorno de Python y sus dependencias, y el escaneo ya no abre repetidamente ventanas de consola
+- El escaneo del vídeo completo conserva varios eventos independientes que superan el umbral, incluidos los duendes consecutivos
+- El escaneo por lotes de carpetas reúne los resultados en una lista de candidatos, fotogramas clave, clips, CSV, hoja de contactos e informe HTML
+- Se añadieron progreso, tiempo transcurrido, tiempo restante estimado, tiempos del vídeo original, niveles de sospecha y revisión manual
+
+## Próximos pasos
+
+- Incluir `ffmpeg` y `ffprobe` en el paquete de macOS para eliminar la dependencia de Homebrew
+- Completar la firma y notarización con Apple Developer ID
+- Permitir elegir el inicio y final del escaneo y la región del cielo
+- Mejorar las estadísticas por lotes, el filtrado, la ordenación y la exportación de resúmenes
+- Calibrar los umbrales con más muestras reales etiquetadas y publicar resultados de precision / recall

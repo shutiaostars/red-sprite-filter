@@ -200,10 +200,17 @@ All video is processed locally on your machine. The tool never uploads video, fr
 
 This is an early public version of a photography workflow tool. It is meant to assist screening, not replace manual review. Issues and feedback are welcome — false positives, missed detections, behavior on different camera models, and feature suggestions.
 
-## Roadmap
+## Recently completed
 
-- Bundle ffmpeg to lower the setup barrier
-- Apple Developer ID signing and notarization
-- Support finer time-range scanning
-- Add a batch result summary view
-- Calibrate screening thresholds with more real samples
+- The Windows installer now bundles `ffmpeg`, `ffprobe`, the Python runtime, and dependencies, and scanning no longer opens repeated console windows
+- Full-video scanning keeps multiple independent events above the threshold, including consecutive sprites
+- Folder batch scanning provides one candidate list plus keyframes, event clips, CSV, contact sheet, and HTML report
+- Scan progress, elapsed time, estimated remaining time, original-video timestamps, suspicion levels, and manual review
+
+## Next steps
+
+- Bundle `ffmpeg` and `ffprobe` in the macOS package to remove the Homebrew dependency
+- Complete Apple Developer ID signing and notarization
+- Let users select scan start/end times and the sky region of interest
+- Add richer batch statistics, candidate filtering, sorting, and summary export
+- Calibrate thresholds with more labeled real-world samples and publish precision/recall results
