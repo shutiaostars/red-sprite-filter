@@ -42,7 +42,7 @@
 ページの右側または下部の **Releases** からダウンロードしてください。
 
 ```text
-red-sprite-filter-1.0.5.dmg
+red-sprite-filter-1.0.6.dmg
 ```
 
 DMG を開き、アプリ（`红色精灵筛选器.app`、表示名は "Red Sprite Filter"）を「アプリケーション」や任意のフォルダにドラッグします。
@@ -59,20 +59,15 @@ DMG を開き、アプリ（`红色精灵筛选器.app`、表示名は "Red Spri
 
 ## 動作に必要な環境
 
-現在の macOS アプリには `numpy` と `Pillow` が同梱されているため、Python パッケージを手動でインストールする必要はありません。
+macOS パッケージには次の依存関係が同梱されています。
 
-対象の Mac に引き続き必要なもの：
+- CPython 3.12.13
+- NumPy 1.26.4
+- Pillow 11.3.0
+- FFmpeg 8.1.2
+- FFprobe 8.1.2
 
-- `ffmpeg`
-- `ffprobe`
-
-Homebrew でのインストールを推奨：
-
-```bash
-brew install ffmpeg
-```
-
-アプリは起動時に依存関係を確認します。`ffmpeg not found` や `ffprobe not found` と表示された場合は、Homebrew で `ffmpeg` がインストールされていることを確認してください。
+Homebrew は不要です。Python、pip、コマンドライン依存関係を別途インストールする必要はありません。アプリは起動時に同梱依存関係を確認します。
 
 ## 推奨する使い方
 
@@ -141,6 +136,7 @@ brew install ffmpeg
 
 ## 最近完了した改善
 
+- macOS パッケージには CPython、NumPy、Pillow、FFmpeg、FFprobe が同梱され、Homebrew は不要になりました
 - Windows インストーラーには `ffmpeg`、`ffprobe`、Python ランタイムと依存関係が組み込まれ、スキャン中にコンソール画面が繰り返し開かなくなりました
 - 動画全体をスキャンし、しきい値を超えた複数の独立イベントや連続するスプライトを保持します
 - フォルダの一括スキャン結果を、統一候補リスト、キーフレーム、イベントクリップ、CSV、コンタクトシート、HTML レポートにまとめます
@@ -148,7 +144,6 @@ brew install ffmpeg
 
 ## 次の予定
 
-- macOS パッケージに `ffmpeg` と `ffprobe` を組み込み、Homebrew への依存をなくす
 - Apple Developer ID による署名と公証を完了する
 - スキャンの開始・終了時刻と空の対象領域を指定できるようにする
 - 一括統計、候補の絞り込み、並べ替え、サマリー書き出しを強化する

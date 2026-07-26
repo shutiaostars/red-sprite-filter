@@ -4,7 +4,6 @@ import shutil
 import subprocess
 import sys
 import hashlib
-import re
 from pathlib import Path
 
 import build_app
@@ -60,7 +59,7 @@ SHA-256:
 - 支持人工标记：确认、疑似、排除
 - 支持导出确认候选列表
 - macOS 原生独立窗口，不再跳转系统浏览器
-- App 内置 `numpy` 和 `Pillow`，不再要求用户手动安装 Python 包
+- macOS App 内置 CPython、NumPy、Pillow、FFmpeg 和 FFprobe
 
 ## 安装方法
 
@@ -69,20 +68,18 @@ SHA-256:
 3. 将 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹
 4. 右键 App，选择“打开”
 
-## 依赖要求
+## 内置依赖
 
-当前 macOS App 已内置 `numpy` 和 `Pillow`，不需要用户手动安装 Python 包。
+macOS App 已内置：
 
-目标电脑仍需要安装：
+- CPython 3.12.13
+- NumPy 1.26.4
+- Pillow 11.3.0
+- FFmpeg 8.1.2
+- FFprobe 8.1.2
 
-- `ffmpeg`
-- `ffprobe`
-
-推荐安装命令：
-
-```bash
-brew install ffmpeg
-```
+无需安装 Homebrew、Python 或任何命令行依赖。第三方许可证位于 App 的
+`Contents/Resources/licenses` 目录。
 
 ## macOS 安全提示
 
@@ -96,7 +93,6 @@ brew install ffmpeg
 
 - 当前版本不是机器学习模型，而是基于颜色、形态、位置和时序特征的候选筛选工具
 - 结果仍需要人工复核
-- 未内置所有运行依赖，陌生机器上可能需要先安装依赖
 - 未签名版本在部分 macOS 设备上首次打开会有安全提示
 
 ## 适合谁
@@ -110,15 +106,44 @@ brew install ffmpeg
     )
 
 
+def write_public_release_notes(digest: str) -> None:
+    path = GITHUB_PUBLISH / f"RELEASE_v{VERSION}.md"
+    path.write_text(
+        f"""# 红色精灵筛选器 v{VERSION}
+
+## 主要更新
+
+- macOS Apple Silicon 安装包内置全部第三方运行依赖
+- 不再需要 Homebrew、系统 Python、pip、NumPy、Pillow、FFmpeg 或 FFprobe
+- 修正启动器的最低系统版本，支持 macOS 12 或更高版本
+- 保留完整视频扫描、连续红色精灵事件、扫描进度和人工复核功能
+
+## 下载
+
+下载 `{RELEASE_DMG.name}`。
+
+SHA-256:
+
+```text
+{digest}
+```
+
+## 安全提示
+
+当前版本使用 ad hoc 签名，尚未进行 Apple Developer ID 公证。首次打开时请
+右键 App 并选择“打开”。
+""",
+        encoding="utf-8",
+    )
+
+
 def refresh_github_publish_files(digest: str) -> None:
     if not GITHUB_PUBLISH.exists():
         return
 
     shutil.copy2(RELEASE_DMG, GITHUB_PUBLISH / RELEASE_DMG.name)
     (GITHUB_PUBLISH / "CHECKSUMS.txt").write_text(f"{digest}  {RELEASE_DMG.name}\n", encoding="utf-8")
-    for path in GITHUB_PUBLISH.glob(f"RELEASE_v{VERSION}*.md"):
-        text = path.read_text(encoding="utf-8")
-        path.write_text(re.sub(r"[0-9a-f]{64}", digest, text), encoding="utf-8")
+    write_public_release_notes(digest)
 
 
 def build_dmg() -> Path:

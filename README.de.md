@@ -42,7 +42,7 @@ Die Oberfläche umfasst:
 Lade aus dem Bereich **Releases** (rechts oder unten auf der Seite) herunter:
 
 ```text
-red-sprite-filter-1.0.5.dmg
+red-sprite-filter-1.0.6.dmg
 ```
 
 Öffne die DMG und ziehe die App (`红色精灵筛选器.app`, angezeigt als "Red Sprite Filter") in die Programme oder einen beliebigen Ordner.
@@ -59,20 +59,15 @@ So öffnest du sie:
 
 ## Abhängigkeiten
 
-Die macOS-App enthält jetzt `numpy` und `Pillow`, sodass Benutzer keine Python-Pakete manuell installieren müssen.
+Das macOS-Paket enthält:
 
-Der Ziel-Mac benötigt weiterhin:
+- CPython 3.12.13
+- NumPy 1.26.4
+- Pillow 11.3.0
+- FFmpeg 8.1.2
+- FFprobe 8.1.2
 
-- `ffmpeg`
-- `ffprobe`
-
-Empfohlene Installation via Homebrew:
-
-```bash
-brew install ffmpeg
-```
-
-Die App prüft die Abhängigkeiten beim Start. Wenn du `ffmpeg not found` oder `ffprobe not found` siehst, stelle sicher, dass `ffmpeg` über Homebrew installiert ist.
+Homebrew ist nicht erforderlich. Python, pip und weitere Kommandozeilen-Abhängigkeiten müssen nicht installiert werden. Die App prüft beim Start ihre eingebetteten Abhängigkeiten.
 
 ## Empfohlene Nutzung
 
@@ -141,6 +136,7 @@ Dies ist eine frühe öffentliche Version eines Foto-Workflow-Werkzeugs. Es dien
 
 ## Kürzlich abgeschlossen
 
+- Das macOS-Paket enthält CPython, NumPy, Pillow, FFmpeg und FFprobe; Homebrew ist nicht erforderlich
 - Der Windows-Installer enthält jetzt `ffmpeg`, `ffprobe`, die Python-Laufzeit und alle Abhängigkeiten; beim Scannen öffnen sich keine wiederholten Konsolenfenster mehr
 - Der vollständige Videoscan behält mehrere unabhängige Ereignisse oberhalb des Schwellenwerts, einschließlich aufeinanderfolgender Sprites
 - Ordner-Stapelscans bündeln Kandidatenliste, Keyframes, Ereignisclips, CSV, Kontaktbogen und HTML-Bericht
@@ -148,7 +144,6 @@ Dies ist eine frühe öffentliche Version eines Foto-Workflow-Werkzeugs. Es dien
 
 ## Nächste Schritte
 
-- `ffmpeg` und `ffprobe` in das macOS-Paket integrieren und die Homebrew-Abhängigkeit entfernen
 - Signierung und Notarisierung mit Apple Developer ID abschließen
 - Start- und Endzeit des Scans sowie den Himmelsbereich auswählbar machen
 - Stapelstatistiken, Kandidatenfilter, Sortierung und Zusammenfassungsexport ausbauen

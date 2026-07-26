@@ -44,7 +44,7 @@
 到右侧或页面下方的 **Releases** 中下载：
 
 ```text
-macOS:   red-sprite-filter-1.0.5.dmg
+macOS:   red-sprite-filter-1.0.6.dmg
 Windows: red-sprite-filter-setup.exe
 ```
 
@@ -64,20 +64,15 @@ Windows 安装包下载后双击 `red-sprite-filter-setup.exe`，按安装向导
 
 ## 依赖
 
-当前 macOS App 已内置 `numpy` 和 `Pillow`，不需要用户手动安装 Python 包。
+macOS 安装包已内置：
 
-macOS 目标电脑仍需要安装：
+- CPython 3.12.13
+- NumPy 1.26.4
+- Pillow 11.3.0
+- FFmpeg 8.1.2
+- FFprobe 8.1.2
 
-- `ffmpeg`
-- `ffprobe`
-
-推荐用 Homebrew 安装：
-
-```bash
-brew install ffmpeg
-```
-
-App 启动后会自动检查依赖状态。如果看到 `ffmpeg not found` 或 `ffprobe not found`，请先确认 Homebrew 已安装 `ffmpeg`。
+无需安装 Homebrew、Python、pip 或任何命令行依赖。App 启动后会自动检查内置依赖状态。
 
 Windows 安装包会随程序打包 `ffmpeg`、`ffprobe`、Python 运行时和 Python 依赖；通常不需要用户额外安装命令行依赖。Windows 10/11 一般已带 Edge WebView2 运行环境。
 
@@ -202,6 +197,7 @@ NOAA 和 NASA 的资料将红色精灵概括为雷暴上方、以红色为主、
 
 ## 已完成的近期改进
 
+- macOS 安装包已内置 CPython、NumPy、Pillow、FFmpeg 和 FFprobe，无需安装 Homebrew
 - Windows 安装包已内置 `ffmpeg`、`ffprobe`、Python 运行时和依赖，扫描时不再反复弹出终端窗口
 - 扫描完整条视频，并保留达到阈值的多个独立事件和连续出现的红色精灵
 - 支持文件夹批量扫描，以统一候选列表、关键帧、事件片段、CSV、接触表和 HTML 报告汇总结果
@@ -209,7 +205,6 @@ NOAA 和 NASA 的资料将红色精灵概括为雷暴上方、以红色为主、
 
 ## 下一步计划
 
-- 在 macOS 安装包中内置 `ffmpeg` 和 `ffprobe`，移除 Homebrew 依赖
 - 完成 Apple Developer ID 签名与公证
 - 支持用户指定扫描起止时间和天空区域
 - 增强批量统计、候选筛选、排序与摘要导出

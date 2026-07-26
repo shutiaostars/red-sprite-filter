@@ -69,6 +69,20 @@ class ReadmeRoadmapTests(unittest.TestCase):
             with self.subTest(filename=filename):
                 self.assertNotIn(obsolete_line, readme)
 
+    def test_localized_readmes_describe_self_contained_macos_package(self):
+        expectations = {
+            "README.md": ("macOS 安装包已内置", "无需安装 Homebrew"),
+            "README.en.md": ("The macOS package bundles", "Homebrew is not required"),
+            "README.ja.md": ("macOS パッケージには", "Homebrew は不要"),
+            "README.es.md": ("El paquete de macOS incluye", "Homebrew no es necesario"),
+            "README.de.md": ("Das macOS-Paket enthält", "Homebrew ist nicht erforderlich"),
+        }
+        for filename, fragments in expectations.items():
+            readme = (ROOT / filename).read_text(encoding="utf-8")
+            with self.subTest(filename=filename):
+                for fragment in fragments:
+                    self.assertIn(fragment, readme)
+
 
 if __name__ == "__main__":
     unittest.main()

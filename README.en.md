@@ -44,7 +44,7 @@ The interface includes:
 Download from the **Releases** section (right side or bottom of the page):
 
 ```text
-macOS:   red-sprite-filter-1.0.5.dmg
+macOS:   red-sprite-filter-1.0.6.dmg
 Windows: red-sprite-filter-setup.exe
 ```
 
@@ -64,20 +64,15 @@ To open:
 
 ## Dependencies
 
-The macOS app now bundles `numpy` and `Pillow`, so users do not need to install Python packages manually.
+The macOS package bundles:
 
-The target Mac still needs:
+- CPython 3.12.13
+- NumPy 1.26.4
+- Pillow 11.3.0
+- FFmpeg 8.1.2
+- FFprobe 8.1.2
 
-- `ffmpeg`
-- `ffprobe`
-
-Recommended install via Homebrew:
-
-```bash
-brew install ffmpeg
-```
-
-The app checks dependencies on launch. If you see `ffmpeg not found` or `ffprobe not found`, make sure Homebrew's `ffmpeg` is installed.
+Homebrew is not required. Users do not need to install Python, pip, or any command-line dependency. The app checks its bundled dependencies on launch.
 
 The Windows installer bundles `ffmpeg`, `ffprobe`, the Python runtime, and Python dependencies, so users usually do not need command-line dependencies. Windows 10/11 normally already includes the Edge WebView2 runtime.
 
@@ -202,6 +197,7 @@ This is an early public version of a photography workflow tool. It is meant to a
 
 ## Recently completed
 
+- The macOS package bundles CPython, NumPy, Pillow, FFmpeg, and FFprobe; Homebrew is not required
 - The Windows installer now bundles `ffmpeg`, `ffprobe`, the Python runtime, and dependencies, and scanning no longer opens repeated console windows
 - Full-video scanning keeps multiple independent events above the threshold, including consecutive sprites
 - Folder batch scanning provides one candidate list plus keyframes, event clips, CSV, contact sheet, and HTML report
@@ -209,7 +205,6 @@ This is an early public version of a photography workflow tool. It is meant to a
 
 ## Next steps
 
-- Bundle `ffmpeg` and `ffprobe` in the macOS package to remove the Homebrew dependency
 - Complete Apple Developer ID signing and notarization
 - Let users select scan start/end times and the sky region of interest
 - Add richer batch statistics, candidate filtering, sorting, and summary export

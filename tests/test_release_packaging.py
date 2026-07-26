@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DMG = ROOT / "outputs" / "红色精灵筛选器.dmg"
-RELEASE_DMG = ROOT / "outputs" / "red-sprite-filter-1.0.5.dmg"
+RELEASE_DMG = ROOT / "outputs" / "red-sprite-filter-1.0.6.dmg"
 GITHUB_PUBLISH = ROOT
 NOTES = ROOT / "outputs" / "GITHUB_RELEASE_NOTES.md"
 
@@ -30,6 +30,10 @@ class ReleasePackagingTests(unittest.TestCase):
         self.assertIn("未签名", text)
         self.assertIn("Apple Developer ID", text)
         self.assertIn("控制台窗口", text)
+        self.assertIn("无需安装 Homebrew", text)
+        self.assertIn("CPython 3.12.13", text)
+        self.assertIn("FFmpeg 8.1.2", text)
+        self.assertNotIn("brew install ffmpeg", text)
 
     def test_app_inside_bundle_uses_native_executable(self):
         plist_path = ROOT / "outputs" / "红色精灵筛选器.app" / "Contents" / "Info.plist"
@@ -42,7 +46,7 @@ class ReleasePackagingTests(unittest.TestCase):
         digest = hashlib.sha256(RELEASE_DMG.read_bytes()).hexdigest()
 
         self.assertEqual((GITHUB_PUBLISH / "CHECKSUMS.txt").read_text(encoding="utf-8"), f"{digest}  {RELEASE_DMG.name}\n")
-        for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.5*.md"):
+        for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.6*.md"):
             self.assertIn(digest, path.read_text(encoding="utf-8"), str(path))
 
 

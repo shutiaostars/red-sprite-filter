@@ -42,7 +42,7 @@ La interfaz incluye:
 Descarga desde la sección **Releases** (a la derecha o al final de la página):
 
 ```text
-red-sprite-filter-1.0.5.dmg
+red-sprite-filter-1.0.6.dmg
 ```
 
 Abre el DMG y arrastra la app (`红色精灵筛选器.app`, que se muestra como "Red Sprite Filter") a Aplicaciones o a cualquier carpeta.
@@ -59,20 +59,15 @@ Para abrirla:
 
 ## Dependencias
 
-La app de macOS ahora incluye `numpy` y `Pillow`, así que los usuarios no necesitan instalar paquetes de Python manualmente.
+El paquete de macOS incluye:
 
-El Mac de destino todavía necesita:
+- CPython 3.12.13
+- NumPy 1.26.4
+- Pillow 11.3.0
+- FFmpeg 8.1.2
+- FFprobe 8.1.2
 
-- `ffmpeg`
-- `ffprobe`
-
-Instalación recomendada con Homebrew:
-
-```bash
-brew install ffmpeg
-```
-
-La app comprueba las dependencias al iniciar. Si ves `ffmpeg not found` o `ffprobe not found`, asegúrate de que `ffmpeg` de Homebrew esté instalado.
+Homebrew no es necesario. No hace falta instalar Python, pip ni ninguna dependencia de línea de comandos. La app comprueba sus dependencias incluidas al iniciar.
 
 ## Uso recomendado
 
@@ -141,6 +136,7 @@ Esta es una versión pública temprana de una herramienta de flujo de trabajo fo
 
 ## Mejoras completadas recientemente
 
+- El paquete de macOS incluye CPython, NumPy, Pillow, FFmpeg y FFprobe; Homebrew no es necesario
 - El instalador de Windows ya incluye `ffmpeg`, `ffprobe`, el entorno de Python y sus dependencias, y el escaneo ya no abre repetidamente ventanas de consola
 - El escaneo del vídeo completo conserva varios eventos independientes que superan el umbral, incluidos los duendes consecutivos
 - El escaneo por lotes de carpetas reúne los resultados en una lista de candidatos, fotogramas clave, clips, CSV, hoja de contactos e informe HTML
@@ -148,7 +144,6 @@ Esta es una versión pública temprana de una herramienta de flujo de trabajo fo
 
 ## Próximos pasos
 
-- Incluir `ffmpeg` y `ffprobe` en el paquete de macOS para eliminar la dependencia de Homebrew
 - Completar la firma y notarización con Apple Developer ID
 - Permitir elegir el inicio y final del escaneo y la región del cielo
 - Mejorar las estadísticas por lotes, el filtrado, la ordenación y la exportación de resúmenes
