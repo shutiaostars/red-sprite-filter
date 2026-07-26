@@ -2,9 +2,10 @@
 
 # Red Sprite Filter
 
-A macOS desktop tool for transient luminous event (TLE) observation that automatically screens suspected **red sprite** lightning frames and clips from storm videos recorded by cameras.
+A macOS / Windows desktop tool for transient luminous event (TLE) observation that automatically screens suspected **red sprite** lightning frames and clips from storm videos recorded by cameras.
 
 ![macOS](https://img.shields.io/badge/macOS-12%2B-0b1220?style=flat-square)
+![Windows](https://img.shields.io/badge/Windows-10%2F11-0078d4?style=flat-square)
 ![Release](https://img.shields.io/badge/download-DMG-00bcd4?style=flat-square)
 ![Local](https://img.shields.io/badge/processing-local-4caf50?style=flat-square)
 
@@ -23,7 +24,7 @@ It does **not** stop at the first candidate — it scans the whole video and the
 
 ## UI preview
 
-The current version is a native macOS window app that uses a WebView to host the local interface. It does not open a browser, and video processing is never uploaded to the network.
+The current version is a desktop window app that uses a WebView to host the local interface. It does not open a browser, and video processing is never uploaded to the network.
 
 The interface includes:
 
@@ -42,10 +43,13 @@ The interface includes:
 Download from the **Releases** section (right side or bottom of the page):
 
 ```text
-red-sprite-filter-1.0.3.dmg
+macOS:   red-sprite-filter-1.0.3.dmg
+Windows: red-sprite-filter-setup.exe
 ```
 
-Open the DMG and drag the app (`红色精灵筛选器.app`, shown as "Red Sprite Filter") to Applications or any folder.
+On macOS, open the DMG and drag the app (`红色精灵筛选器.app`, shown as "Red Sprite Filter") to Applications or any folder.
+
+Windows installer users can double-click `red-sprite-filter-setup.exe` and follow the installer. It creates a Start Menu shortcut and can optionally create a desktop shortcut.
 
 ## First launch
 
@@ -73,6 +77,8 @@ brew install ffmpeg
 ```
 
 The app checks dependencies on launch. If you see `ffmpeg not found` or `ffprobe not found`, make sure Homebrew's `ffmpeg` is installed.
+
+The Windows installer bundles `ffmpeg`, `ffprobe`, the Python runtime, and Python dependencies, so users usually do not need command-line dependencies. Windows 10/11 normally already includes the Edge WebView2 runtime.
 
 ## Recommended usage
 

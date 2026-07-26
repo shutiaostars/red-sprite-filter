@@ -1,0 +1,44 @@
+name: Build Windows installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Installer version"
+        required: false
+        default: "1.0.4"
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "windows/**"
+      - ".github/workflows/build-windows.yml"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if (-not $version) { $version = "1.0.4" }
+          windows/build_windows.ps1 -Version $version
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: red-sprite-filter-windows-installer
+          path: dist/installer/red-sprite-filter-setup.exe
+          if-no-files-found: error

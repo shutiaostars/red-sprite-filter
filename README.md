@@ -2,9 +2,10 @@
 
 # 红色精灵筛选器
 
-一个面向高空瞬态发光事件观测的 macOS 桌面工具，用来从相机拍摄的雷暴视频中自动筛选疑似红色精灵闪电帧与片段。
+一个面向高空瞬态发光事件观测的 macOS / Windows 桌面工具，用来从相机拍摄的雷暴视频中自动筛选疑似红色精灵闪电帧与片段。
 
 ![macOS](https://img.shields.io/badge/macOS-12%2B-0b1220?style=flat-square)
+![Windows](https://img.shields.io/badge/Windows-10%2F11-0078d4?style=flat-square)
 ![Release](https://img.shields.io/badge/download-DMG-00bcd4?style=flat-square)
 ![Local](https://img.shields.io/badge/processing-local-4caf50?style=flat-square)
 
@@ -23,7 +24,7 @@
 
 ## 界面预览
 
-当前版本是 macOS 原生窗口 App，内部使用 WebView 承载本地界面。打开后不会跳转浏览器，视频处理也不会上传到网络。
+当前版本是桌面窗口 App，内部使用 WebView 承载本地界面。打开后不会跳转浏览器，视频处理也不会上传到网络。
 
 界面包含：
 
@@ -42,10 +43,13 @@
 到右侧或页面下方的 **Releases** 中下载：
 
 ```text
-red-sprite-filter-1.0.3.dmg
+macOS:   red-sprite-filter-1.0.3.dmg
+Windows: red-sprite-filter-setup.exe
 ```
 
-下载后打开 DMG，把 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹即可。
+macOS 下载后打开 DMG，把 `红色精灵筛选器.app` 拖到 Applications 或任意文件夹即可。
+
+Windows 安装包下载后双击 `red-sprite-filter-setup.exe`，按安装向导完成安装。安装器会创建开始菜单快捷方式，也可选择创建桌面快捷方式。
 
 ## 第一次打开
 
@@ -61,7 +65,7 @@ red-sprite-filter-1.0.3.dmg
 
 当前 macOS App 已内置 `numpy` 和 `Pillow`，不需要用户手动安装 Python 包。
 
-目标电脑仍需要安装：
+macOS 目标电脑仍需要安装：
 
 - `ffmpeg`
 - `ffprobe`
@@ -73,6 +77,8 @@ brew install ffmpeg
 ```
 
 App 启动后会自动检查依赖状态。如果看到 `ffmpeg not found` 或 `ffprobe not found`，请先确认 Homebrew 已安装 `ffmpeg`。
+
+Windows 安装包会随程序打包 `ffmpeg`、`ffprobe`、Python 运行时和 Python 依赖；通常不需要用户额外安装命令行依赖。Windows 10/11 一般已带 Edge WebView2 运行环境。
 
 ## 推荐使用方式
 

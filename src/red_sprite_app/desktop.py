@@ -57,8 +57,10 @@ def main() -> None:
         height=860,
     )
     window.events.closed += _on_closed
-    # create_window blocks until all windows are closed.
-    backend.shutdown()
+    try:
+        webview.start()
+    finally:
+        backend.shutdown()
 
 
 if __name__ == "__main__":
