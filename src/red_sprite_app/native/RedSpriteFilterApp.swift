@@ -32,24 +32,19 @@ final class RedSpriteAppDelegate: NSObject, NSApplicationDelegate, NSWindowDeleg
             throw AppError.message("无法定位 App 资源目录")
         }
 
-        let appResourcePath = URL(fileURLWithPath: resourcePath).appendingPathComponent("app")
-        let pythonLibPath = URL(fileURLWithPath: resourcePath).appendingPathComponent("python_lib")
+        let resourceURL = URL(fileURLWithPath: resourcePath)
+        let appResourcePath = resourceURL.appendingPathComponent("app")
+        let pythonURL = resourceURL.appendingPathComponent("runtime/python/bin/python3")
+        let binaryPath = resourceURL.appendingPathComponent("bin")
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+        process.executableURL = pythonURL
         process.currentDirectoryURL = appResourcePath
         process.arguments = ["-m", "red_sprite_app.backend", "--port", "0"]
         var environment = ProcessInfo.processInfo.environment
-        let toolPath = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-        if let existingPath = environment["PATH"], !existingPath.isEmpty {
-            environment["PATH"] = "\(toolPath):\(existingPath)"
-        } else {
-            environment["PATH"] = toolPath
-        }
-        if let existingPythonPath = environment["PYTHONPATH"], !existingPythonPath.isEmpty {
-            environment["PYTHONPATH"] = "\(pythonLibPath.path):\(appResourcePath.path):\(existingPythonPath)"
-        } else {
-            environment["PYTHONPATH"] = "\(pythonLibPath.path):\(appResourcePath.path)"
-        }
+        environment["PATH"] = "\(binaryPath.path):/usr/bin:/bin:/usr/sbin:/sbin"
+        environment["PYTHONPATH"] = appResourcePath.path
+        environment["PYTHONNOUSERSITE"] = "1"
+        environment["PYTHONDONTWRITEBYTECODE"] = "1"
         process.environment = environment
 
         let outputPipe = Pipe()

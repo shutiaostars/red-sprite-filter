@@ -7,6 +7,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from vendor_macos_runtime import vendor_runtime
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "work" if (ROOT / "work").exists() else ROOT / "src"
@@ -16,13 +18,14 @@ CONTENTS = APP / "Contents"
 MACOS = CONTENTS / "MacOS"
 RESOURCES = CONTENTS / "Resources"
 APP_RESOURCES = RESOURCES / "app"
-PYTHON_LIB = RESOURCES / "python_lib"
+RUNTIME = RESOURCES / "runtime" / "python"
+BUNDLED_PYTHON = RUNTIME / "bin" / "python3"
+BINARIES = RESOURCES / "bin"
+LICENSES = RESOURCES / "licenses"
 EXECUTABLE = "red-sprite-filter"
 ICON_SOURCE = SOURCE_ROOT / "red_sprite_app" / "assets" / "AppIcon-source.png"
 ICON_OUTPUT = RESOURCES / "AppIcon.icns"
-SYSTEM_PYTHON = Path("/usr/bin/python3")
-VENDORED_PYTHON_REQUIREMENTS = ["numpy==1.26.4", "Pillow>=10.0,<12.0"]
-VERSION = "1.0.5"
+VERSION = "1.0.6"
 
 
 def copytree(src: Path, dst: Path) -> None:
@@ -73,43 +76,6 @@ def write_icon() -> None:
         subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(ICON_OUTPUT)], check=True)
 
 
-def vendor_python_dependencies() -> None:
-    if not SYSTEM_PYTHON.exists():
-        raise RuntimeError(f"Missing macOS system Python: {SYSTEM_PYTHON}")
-    if PYTHON_LIB.exists():
-        shutil.rmtree(PYTHON_LIB)
-    PYTHON_LIB.mkdir(parents=True)
-    subprocess.run(
-        [
-            str(SYSTEM_PYTHON),
-            "-m",
-            "pip",
-            "install",
-            "--disable-pip-version-check",
-            "--ignore-installed",
-            "--no-deps",
-            "--upgrade",
-            "--target",
-            str(PYTHON_LIB),
-            *VENDORED_PYTHON_REQUIREMENTS,
-        ],
-        check=True,
-    )
-    subprocess.run(
-        [
-            str(SYSTEM_PYTHON),
-            "-c",
-            "import numpy, PIL; print(numpy.__version__)",
-        ],
-        check=True,
-        env={"PYTHONPATH": str(PYTHON_LIB)},
-    )
-    for cache_dir in PYTHON_LIB.rglob("__pycache__"):
-        shutil.rmtree(cache_dir)
-    for cache_file in PYTHON_LIB.rglob("*.pyc"):
-        cache_file.unlink()
-
-
 def strip_extended_attributes(path: Path) -> None:
     subprocess.run(["xattr", "-cr", str(path)], check=True)
 
@@ -126,7 +92,7 @@ def build() -> Path:
     APP_RESOURCES.mkdir(parents=True)
     write_plist()
     write_icon()
-    vendor_python_dependencies()
+    vendor_runtime(RESOURCES)
 
     copytree(SOURCE_ROOT / "red_sprite_app", APP_RESOURCES / "red_sprite_app")
     shutil.copy2(SOURCE_ROOT / "red_sprite_filter.py", APP_RESOURCES / "red_sprite_filter.py")
@@ -134,6 +100,8 @@ def build() -> Path:
     subprocess.run(
         [
             "swiftc",
+            "-target",
+            "arm64-apple-macos12.0",
             str(SOURCE_ROOT / "red_sprite_app" / "native" / "RedSpriteFilterApp.swift"),
             "-framework",
             "Cocoa",
@@ -150,8 +118,12 @@ def build() -> Path:
         CONTENTS / "Info.plist",
         executable,
         ICON_OUTPUT,
-        PYTHON_LIB / "numpy",
-        PYTHON_LIB / "PIL",
+        BUNDLED_PYTHON,
+        BINARIES / "ffmpeg",
+        BINARIES / "ffprobe",
+        RUNTIME / "lib" / "python3.12" / "site-packages" / "numpy",
+        RUNTIME / "lib" / "python3.12" / "site-packages" / "PIL",
+        LICENSES / "THIRD_PARTY_NOTICES.md",
         APP_RESOURCES / "red_sprite_app" / "backend.py",
         APP_RESOURCES / "red_sprite_app" / "static" / "index.html",
         APP_RESOURCES / "red_sprite_filter.py",

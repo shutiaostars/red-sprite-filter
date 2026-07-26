@@ -1,6 +1,7 @@
 import plistlib
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "work" if (ROOT / "work").exists() else ROOT / "src"
 APP = ROOT / "outputs" / "红色精灵筛选器.app"
+RESOURCES = APP / "Contents" / "Resources"
+BUNDLED_PYTHON = RESOURCES / "runtime" / "python" / "bin" / "python3"
+BUNDLED_FFMPEG = RESOURCES / "bin" / "ffmpeg"
+BUNDLED_FFPROBE = RESOURCES / "bin" / "ffprobe"
 
 
 class RedSpriteBuildTests(unittest.TestCase):
@@ -21,8 +26,11 @@ class RedSpriteBuildTests(unittest.TestCase):
         self.assertTrue((APP / "Contents" / "Resources" / "AppIcon.icns").exists())
         self.assertTrue((APP / "Contents" / "Resources" / "app" / "red_sprite_app" / "backend.py").exists())
         self.assertTrue((APP / "Contents" / "Resources" / "app" / "red_sprite_filter.py").exists())
-        self.assertTrue((APP / "Contents" / "Resources" / "python_lib" / "numpy").exists())
-        self.assertTrue((APP / "Contents" / "Resources" / "python_lib" / "PIL").exists())
+        self.assertTrue(BUNDLED_PYTHON.exists())
+        self.assertTrue(BUNDLED_FFMPEG.exists())
+        self.assertTrue(BUNDLED_FFPROBE.exists())
+        self.assertTrue((RESOURCES / "runtime" / "python" / "lib" / "python3.12" / "site-packages" / "numpy").exists())
+        self.assertTrue((RESOURCES / "runtime" / "python" / "lib" / "python3.12" / "site-packages" / "PIL").exists())
 
     def test_info_plist_has_expected_bundle_keys(self):
         with (APP / "Contents" / "Info.plist").open("rb") as handle:
@@ -32,7 +40,7 @@ class RedSpriteBuildTests(unittest.TestCase):
         self.assertEqual(plist["CFBundleExecutable"], "red-sprite-filter")
         self.assertEqual(plist["CFBundleIdentifier"], "local.red-sprite-filter")
         self.assertEqual(plist["CFBundleIconFile"], "AppIcon")
-        self.assertEqual(plist["CFBundleShortVersionString"], "1.0.5")
+        self.assertEqual(plist["CFBundleShortVersionString"], "1.0.6")
 
     def test_native_webview_executable_exists(self):
         executable = APP / "Contents" / "MacOS" / "red-sprite-filter"
@@ -66,31 +74,46 @@ class RedSpriteBuildTests(unittest.TestCase):
 
         self.assertIn("WKWebView", text)
         self.assertIn("Process()", text)
-        self.assertIn("python_lib", text)
+        self.assertIn('appendingPathComponent("runtime/python/bin/python3")', text)
+        self.assertIn('appendingPathComponent("bin")', text)
         self.assertIn('environment["PYTHONPATH"]', text)
         self.assertIn('environment["PATH"]', text)
-        self.assertIn("/opt/homebrew/bin", text)
+        self.assertIn('environment["PYTHONDONTWRITEBYTECODE"]', text)
+        self.assertNotIn("/usr/bin/python3", text)
+        self.assertNotIn("/opt/homebrew", text)
+        self.assertNotIn("/usr/local", text)
         self.assertIn("--port", text)
         self.assertIn('"0"', text)
         self.assertNotIn("--open", text)
         self.assertIn("terminate()", text)
 
-    def test_bundled_dependencies_import_with_system_python(self):
-        python_lib = APP / "Contents" / "Resources" / "python_lib"
+    def test_bundled_dependencies_import_with_bundled_python(self):
+        app_root = RESOURCES / "app"
         result = subprocess.run(
-            ["/usr/bin/python3", "-c", "import pathlib, numpy, PIL; print(numpy.__file__); print(PIL.__file__)"],
-            env={"PYTHONPATH": str(python_lib), "PYTHONNOUSERSITE": "1"},
+            [
+                str(BUNDLED_PYTHON),
+                "-c",
+                "import numpy, PIL; print(numpy.__version__); print(PIL.__version__)",
+            ],
+            env={
+                "PATH": f"{RESOURCES / 'bin'}:/usr/bin:/bin",
+                "PYTHONPATH": str(app_root),
+                "PYTHONNOUSERSITE": "1",
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "HOME": tempfile.mkdtemp(),
+            },
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
 
         self.assertEqual(result.returncode, 0, result.stdout)
-        self.assertIn(str(python_lib), result.stdout)
+        self.assertIn("1.26.4", result.stdout)
+        self.assertIn("11.3.0", result.stdout)
 
     def test_bundled_numpy_wheel_supports_macos_12_release_target(self):
-        python_lib = APP / "Contents" / "Resources" / "python_lib"
-        wheel_files = list(python_lib.glob("numpy-*.dist-info/WHEEL"))
+        site_packages = RESOURCES / "runtime" / "python" / "lib" / "python3.12" / "site-packages"
+        wheel_files = list(site_packages.glob("numpy-*.dist-info/WHEEL"))
         self.assertTrue(wheel_files)
         wheel_text = wheel_files[0].read_text(encoding="utf-8")
 
