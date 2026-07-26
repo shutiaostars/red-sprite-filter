@@ -32,7 +32,7 @@ class RedSpriteBuildTests(unittest.TestCase):
         self.assertEqual(plist["CFBundleExecutable"], "red-sprite-filter")
         self.assertEqual(plist["CFBundleIdentifier"], "local.red-sprite-filter")
         self.assertEqual(plist["CFBundleIconFile"], "AppIcon")
-        self.assertEqual(plist["CFBundleShortVersionString"], "1.0.1")
+        self.assertEqual(plist["CFBundleShortVersionString"], "1.0.4")
 
     def test_native_webview_executable_exists(self):
         executable = APP / "Contents" / "MacOS" / "red-sprite-filter"

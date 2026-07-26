@@ -42,7 +42,7 @@
 ページの右側または下部の **Releases** からダウンロードしてください。
 
 ```text
-red-sprite-filter-1.0.3.dmg
+red-sprite-filter-1.0.4.dmg
 ```
 
 DMG を開き、アプリ（`红色精灵筛选器.app`、表示名は "Red Sprite Filter"）を「アプリケーション」や任意のフォルダにドラッグします。

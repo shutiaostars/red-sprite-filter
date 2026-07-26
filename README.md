@@ -20,7 +20,7 @@
 - `report.html`
 - 人工复核后的 `confirmed_candidates.csv`
 
-它不会只找到第一个候选就停止，而是会扫描完整条视频，再从全片中挑出得分最高的候选事件。
+它不会只找到第一个候选就停止，而是会扫描完整条视频。精准筛选会保留所有达到最小分数的独立事件，连续出现的红色精灵不再只保留最强一组。
 
 ## 界面预览
 
@@ -43,7 +43,7 @@
 到右侧或页面下方的 **Releases** 中下载：
 
 ```text
-macOS:   red-sprite-filter-1.0.3.dmg
+macOS:   red-sprite-filter-1.0.4.dmg
 Windows: red-sprite-filter-setup.exe
 ```
 

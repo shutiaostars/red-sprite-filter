@@ -1135,7 +1135,7 @@ def process_video(
         max_events=args.max_candidates,
         cluster_seconds=args.cluster_seconds,
         min_score=args.min_score,
-        percentile=args.percentile,
+        percentile=0.0 if args.score_mode == "precision" else args.percentile,
         min_red_pixels=args.min_red_pixels,
     )
 

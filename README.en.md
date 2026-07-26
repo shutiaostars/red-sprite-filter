@@ -20,7 +20,7 @@ Red sprites are typically brief, faint, located high in the sky, and have fine, 
 - `report.html`
 - `confirmed_candidates.csv` after manual review
 
-It does **not** stop at the first candidate — it scans the whole video and then picks the highest-scoring candidate events from the entire footage.
+It does **not** stop at the first candidate. Precise screening keeps every separate event that reaches the explicit minimum score, so consecutive sprites are no longer reduced to only the strongest event.
 
 ## UI preview
 
@@ -43,7 +43,7 @@ The interface includes:
 Download from the **Releases** section (right side or bottom of the page):
 
 ```text
-macOS:   red-sprite-filter-1.0.3.dmg
+macOS:   red-sprite-filter-1.0.4.dmg
 Windows: red-sprite-filter-setup.exe
 ```
 

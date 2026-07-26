@@ -16,7 +16,7 @@ OUTPUTS = ROOT / "outputs"
 APP = OUTPUTS / "红色精灵筛选器.app"
 DMG = OUTPUTS / "红色精灵筛选器.dmg"
 RELEASE_DMG = OUTPUTS / f"red-sprite-filter-{VERSION}.dmg"
-GITHUB_PUBLISH = OUTPUTS / "github_publish"
+GITHUB_PUBLISH = ROOT
 NOTES = OUTPUTS / "GITHUB_RELEASE_NOTES.md"
 
 
@@ -40,7 +40,7 @@ def write_release_notes(digest: str) -> None:
 {RELEASE_DMG.name}
 ```
 
-这个文件可上传到 GitHub Releases，供其他用户下载。本版本修复了其他电脑上扫描时报 `ModuleNotFoundError: No module named 'numpy'` 的问题。
+这个文件可上传到 GitHub Releases，供其他用户下载。本版本修复了连续出现的红色精灵只保留最强一组的问题。
 
 SHA-256:
 
@@ -52,6 +52,7 @@ SHA-256:
 
 - 从雷暴视频中自动筛选疑似红色精灵闪电
 - 扫描完整条视频，不会遇到第一个候选就停止
+- 精准筛选会保留所有达到最小分数的独立事件，连续出现时不再只保留最强一组
 - 支持单视频和文件夹批量扫描
 - 支持精准筛选和高召回筛选
 - 自动导出候选关键帧、候选片段、CSV、HTML 报告和 contact sheet

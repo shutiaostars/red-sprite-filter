@@ -2,6 +2,7 @@ import tempfile
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 
@@ -137,6 +138,33 @@ class RedSpriteFilterTests(unittest.TestCase):
         )
 
         self.assertEqual([event.frame_index for event in events], [8, 16])
+
+    def test_precision_process_keeps_separate_events_above_explicit_score_floor(self):
+        scores = [
+            rsf.FrameScore(11, 0.37, 5.6, 120, 1200.0),
+            rsf.FrameScore(89, 2.97, 11.9, 150, 1800.0),
+            rsf.FrameScore(136, 4.53, 1.56, 44, 700.0),
+            rsf.FrameScore(194, 6.47, 10.7, 65, 1400.0),
+            rsf.FrameScore(219, 7.30, 5.2, 50, 900.0),
+            rsf.FrameScore(253, 8.43, 5.0, 42, 800.0),
+            rsf.FrameScore(307, 10.23, 13.6, 138, 1900.0),
+        ]
+        args = rsf.parse_args(["sprites.mov", "--min-score", "0.8"])
+
+        with tempfile.TemporaryDirectory() as td, patch.object(
+            rsf, "scan_video", return_value=scores
+        ), patch.object(rsf, "extract_frame"), patch.object(rsf, "extract_clip"):
+            events = rsf.process_video(
+                Path("sprites.mov"),
+                Path(td),
+                args,
+                info=rsf.VideoInfo(width=3840, height=2160, fps=30.0, duration=11.53),
+            )
+
+        self.assertEqual(
+            [round(event.timestamp, 2) for event in events],
+            [0.37, 2.97, 4.53, 6.47, 7.30, 8.43, 10.23],
+        )
 
     def test_compute_clip_window_clamps_to_video_duration(self):
         self.assertEqual(rsf.compute_clip_window(0.4, 1.0, 2.0, 10.0), (0.0, 2.4))

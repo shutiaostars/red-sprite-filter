@@ -159,8 +159,8 @@ class RedSpriteBackendTests(unittest.TestCase):
 
 class RedSpriteStaticUiTests(unittest.TestCase):
     def test_mode_buttons_use_chinese_labels_but_keep_internal_ids(self):
-        html = Path("red_sprite_app/static/index.html").read_text(encoding="utf-8")
-        script = Path("red_sprite_app/static/app.js").read_text(encoding="utf-8")
+        html = (SOURCE_ROOT / "red_sprite_app/static/index.html").read_text(encoding="utf-8")
+        script = (SOURCE_ROOT / "red_sprite_app/static/app.js").read_text(encoding="utf-8")
 
         self.assertIn('id="precisionMode"', html)
         self.assertIn('id="recallMode"', html)
@@ -172,8 +172,8 @@ class RedSpriteStaticUiTests(unittest.TestCase):
         self.assertIn('setMode("recall")', script)
 
     def test_ui_has_native_path_picker_buttons(self):
-        html = Path("red_sprite_app/static/index.html").read_text(encoding="utf-8")
-        script = Path("red_sprite_app/static/app.js").read_text(encoding="utf-8")
+        html = (SOURCE_ROOT / "red_sprite_app/static/index.html").read_text(encoding="utf-8")
+        script = (SOURCE_ROOT / "red_sprite_app/static/app.js").read_text(encoding="utf-8")
 
         self.assertIn('id="chooseVideo"', html)
         self.assertIn(">选择视频<", html)
@@ -186,7 +186,7 @@ class RedSpriteStaticUiTests(unittest.TestCase):
         self.assertIn('choosePath("output-folder", "outputPath")', script)
 
     def test_stylesheet_uses_cyan_instrument_palette(self):
-        css = Path("red_sprite_app/static/styles.css").read_text(encoding="utf-8")
+        css = (SOURCE_ROOT / "red_sprite_app/static/styles.css").read_text(encoding="utf-8")
 
         self.assertIn("--bg: #02060b;", css)
         self.assertIn("--cyan: #00e5ff;", css)

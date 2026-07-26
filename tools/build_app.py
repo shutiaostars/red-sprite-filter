@@ -22,7 +22,7 @@ ICON_SOURCE = SOURCE_ROOT / "red_sprite_app" / "assets" / "AppIcon-source.png"
 ICON_OUTPUT = RESOURCES / "AppIcon.icns"
 SYSTEM_PYTHON = Path("/usr/bin/python3")
 VENDORED_PYTHON_REQUIREMENTS = ["numpy==1.26.4", "Pillow>=10.0,<12.0"]
-VERSION = "1.0.1"
+VERSION = "1.0.4"
 
 
 def copytree(src: Path, dst: Path) -> None:
