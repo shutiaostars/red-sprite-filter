@@ -36,6 +36,7 @@ class WindowsPackagingTests(unittest.TestCase):
         self.assertIn("{autoprograms}", script)
         self.assertIn("{autodesktop}", script)
         self.assertIn("red-sprite-filter.exe", script)
+        self.assertNotIn("ChineseSimplified.isl", script)
 
     def test_github_actions_builds_windows_installer_artifact(self):
         workflow = (ROOT / ".github" / "workflows" / "build-windows.yml").read_text(encoding="utf-8")
