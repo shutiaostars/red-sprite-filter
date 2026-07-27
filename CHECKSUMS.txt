@@ -1,1 +1,2 @@
 ea1d74f25c9436d2818fc01896ba7fcda53f647b8de05dc9425ad31b305d751a  red-sprite-filter-1.0.6.dmg
+05a783b757422c6bc517f1cd7d54570be4de1168016c15dbd3ad80da8c62aa68  red-sprite-filter-setup.exe

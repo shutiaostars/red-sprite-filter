@@ -6,7 +6,7 @@ on:
       version:
         description: "Installer version"
         required: false
-        default: "1.0.5"
+        default: "1.0.6"
   push:
     branches: [main]
     paths:
@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ github.event.inputs.version }}"
-          if (-not $version) { $version = "1.0.5" }
+          if (-not $version) { $version = "1.0.6" }
           windows/build_windows.ps1 -Version $version
 
       - name: Upload Windows installer

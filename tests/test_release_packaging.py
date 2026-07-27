@@ -51,7 +51,8 @@ class ReleasePackagingTests(unittest.TestCase):
     def test_github_publish_hashes_match_current_release_dmg(self):
         digest = hashlib.sha256(RELEASE_DMG.read_bytes()).hexdigest()
 
-        self.assertEqual((GITHUB_PUBLISH / "CHECKSUMS.txt").read_text(encoding="utf-8"), f"{digest}  {RELEASE_DMG.name}\n")
+        checksums = (GITHUB_PUBLISH / "CHECKSUMS.txt").read_text(encoding="utf-8").splitlines()
+        self.assertIn(f"{digest}  {RELEASE_DMG.name}", checksums)
         for path in GITHUB_PUBLISH.glob("RELEASE_v1.0.6*.md"):
             self.assertIn(digest, path.read_text(encoding="utf-8"), str(path))
 

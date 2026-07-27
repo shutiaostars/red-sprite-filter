@@ -46,15 +46,15 @@ class WindowsPackagingTests(unittest.TestCase):
         self.assertIn("red-sprite-filter-windows-installer", workflow)
         self.assertIn("red-sprite-filter-setup.exe", workflow)
 
-    def test_windows_build_version_is_1_0_5_everywhere(self):
+    def test_windows_build_version_is_1_0_6_everywhere(self):
         workflow = (ROOT / ".github" / "workflows" / "build-windows.yml").read_text(encoding="utf-8")
         build_script = (ROOT / "windows" / "build_windows.ps1").read_text(encoding="utf-8")
         installer = (ROOT / "windows" / "red_sprite_filter.iss").read_text(encoding="utf-8")
 
-        self.assertIn('default: "1.0.5"', workflow)
-        self.assertIn('$version = "1.0.5"', workflow)
-        self.assertIn('[string]$Version = "1.0.5"', build_script)
-        self.assertIn('#define MyAppVersion "1.0.5"', installer)
+        self.assertIn('default: "1.0.6"', workflow)
+        self.assertIn('$version = "1.0.6"', workflow)
+        self.assertIn('[string]$Version = "1.0.6"', build_script)
+        self.assertIn('#define MyAppVersion "1.0.6"', installer)
 
     def test_readme_mentions_windows_installer_download(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -62,8 +62,21 @@ class WindowsPackagingTests(unittest.TestCase):
 
         self.assertIn("Windows 安装包", readme)
         self.assertIn("red-sprite-filter-setup.exe", readme)
+        self.assertIn("releases/download/v1.0.6/red-sprite-filter-setup.exe", readme)
         self.assertIn("Windows installer", english)
         self.assertIn("red-sprite-filter-setup.exe", english)
+        self.assertIn("releases/download/v1.0.6/red-sprite-filter-setup.exe", english)
+
+    def test_current_release_documents_windows_installer_checksum(self):
+        checksums = (ROOT / "CHECKSUMS.txt").read_text(encoding="utf-8")
+        release_notes = (ROOT / "RELEASE_v1.0.6.md").read_text(encoding="utf-8")
+
+        expected_line = (
+            "05a783b757422c6bc517f1cd7d54570be4de1168016c15dbd3ad80da8c62aa68"
+            "  red-sprite-filter-setup.exe"
+        )
+        self.assertIn(expected_line, checksums)
+        self.assertIn(expected_line, release_notes)
 
     def test_pywebview_desktop_enters_event_loop(self):
         desktop = (ROOT / "src" / "red_sprite_app" / "desktop.py").read_text(encoding="utf-8")

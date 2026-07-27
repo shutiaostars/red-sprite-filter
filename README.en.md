@@ -6,7 +6,7 @@ A macOS / Windows desktop tool for transient luminous event (TLE) observation th
 
 ![macOS](https://img.shields.io/badge/macOS-12%2B-0b1220?style=flat-square)
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-0078d4?style=flat-square)
-![Release](https://img.shields.io/badge/download-DMG-00bcd4?style=flat-square)
+[![Release](https://img.shields.io/badge/download-DMG%20%2B%20EXE-00bcd4?style=flat-square)](https://github.com/shutiaostars/red-sprite-filter/releases/latest)
 ![Local](https://img.shields.io/badge/processing-local-4caf50?style=flat-square)
 
 ## What it does
@@ -43,10 +43,8 @@ The interface includes:
 
 Download from the **Releases** section (right side or bottom of the page):
 
-```text
-macOS:   red-sprite-filter-1.0.6.dmg
-Windows: red-sprite-filter-setup.exe
-```
+- [macOS Apple Silicon: red-sprite-filter-1.0.6.dmg](https://github.com/shutiaostars/red-sprite-filter/releases/download/v1.0.6/red-sprite-filter-1.0.6.dmg)
+- [Windows 10/11: red-sprite-filter-setup.exe](https://github.com/shutiaostars/red-sprite-filter/releases/download/v1.0.6/red-sprite-filter-setup.exe)
 
 On macOS, open the DMG and drag the app (`红色精灵筛选器.app`, shown as "Red Sprite Filter") to Applications or any folder.
 
