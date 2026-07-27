@@ -22,6 +22,25 @@ OFFICIAL_URLS = [
 
 
 class ReadmeReferenceTests(unittest.TestCase):
+    def test_chinese_readme_embeds_ui_screenshots_and_release_test_results(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        screenshots = [
+            "docs/images/ui-overview.png",
+            "docs/images/candidate-review.png",
+        ]
+
+        self.assertIn("## 界面、功能与实测成果", readme)
+        self.assertIn("63 项全部通过", readme)
+        self.assertIn("不等同于算法的 precision / recall", readme)
+        self.assertIn("快速连续事件仍可能被相邻帧聚类合并", readme)
+        self.assertNotIn("连续出现的红色精灵不再只保留最强一组", readme)
+        for relative_path in screenshots:
+            with self.subTest(relative_path=relative_path):
+                self.assertIn(f"]({relative_path})", readme)
+                image = ROOT / relative_path
+                self.assertTrue(image.exists())
+                self.assertGreater(image.stat().st_size, 100_000)
+
     def test_chinese_readme_documents_scientific_basis_and_references(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
 
