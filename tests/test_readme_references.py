@@ -26,7 +26,7 @@ class ReadmeReferenceTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         screenshots = [
             "docs/images/ui-overview.png",
-            "docs/images/candidate-review.png",
+            "docs/images/candidate-review.jpg",
         ]
 
         self.assertIn("## 界面、功能与实测成果", readme)
